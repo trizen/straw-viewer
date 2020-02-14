@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=GTK Youtube Viewer
+Version=1.0
+Comment=Search and play YouTube videos.
+Exec=gtk-straw-viewer
+Icon=gtk-straw-viewer
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=AudioVideo;GTK;

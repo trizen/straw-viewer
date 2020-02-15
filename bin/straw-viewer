@@ -81,11 +81,6 @@ my $execname = 'straw-viewer';
 require Term::ReadLine;
 my $term = Term::ReadLine->new("$appname $version");
 
-# Developer key
-my $key = 'aXalQYmzI8gPkMSLyMhpApfMAiU2b23Qz2nE3mq';
-
-sub VIDEO_PART () { 'contentDetails,statistics,snippet' }
-
 # Options (key=>value) goes here
 my %opt;
 my $term_width = 80;
@@ -257,7 +252,7 @@ my %CONFIG = (
     highlight_watched    => 1,
     highlight_color      => 'bold',
     remove_played_file   => 0,
-    history              => 0,
+    history              => undef,      # auto-defined
     history_limit        => 100_000,
     history_file         => $history_file,
     convert_cmd          => 'ffmpeg -i *IN* *OUT*',
@@ -536,6 +531,19 @@ sub load_config {
         $update_config = 1;
     }
 
+    # Enable history if Term::ReadLine::Gnu::XS is installed
+    if (not defined $CONFIG{history}) {
+
+        if ($term->can('ReadHistory')) {
+            $CONFIG{history} = 1;
+        }
+        else {
+            $CONFIG{history} = 0;
+        }
+
+        $update_config = 1;
+    }
+
     foreach my $key (keys %CONFIG) {
         if (not exists $CONFIG->{$key}) {
             $update_config = 1;
@@ -600,77 +608,14 @@ if ($opt{history}) {
     }
 }
 
-{
-    my $i = length $key;
-    $key =~ s/(.{$i})(.)/$2$1/g while --$i;
-}
-
 my $yv_obj = WWW::StrawViewer->new(
                                      escape_utf8         => 1,
-                                     key                 => $key,
                                      config_dir          => $config_dir,
                                      cache_dir           => $opt{cache_dir},
                                      lwp_env_proxy       => $opt{env_proxy},
                                      use_invidious_api   => $opt{use_invidious_api},
                                      authentication_file => $authentication_file,
                                     );
-
-{
-    $yv_obj->set_client_id('923751928481.apps.googleusercontent.com');
-    $yv_obj->set_client_secret("\26/Ae]3\b\6\x186a:*#0\32\t\f\n\27\17GC`" ^ substr($key, -24));
-    $yv_obj->set_redirect_uri('urn:ietf:wg:oauth:2.0:oob');
-}
-
-if (-f $api_file) {
-
-    open(my $fh, '<', $api_file) or die "[!] Can't open file <<$api_file>> for reading: $!\n";
-    my $content = do { local $/; <$fh> };
-    my $api     = $yv_obj->parse_json_string($content);
-
-    if (ref($api) ne 'HASH') {
-        die "[!] Invalid format inside file 'api.json'.\n";
-    }
-
-    my $orig_key           = $yv_obj->get_key;
-    my $orig_client_id     = $yv_obj->get_client_id;
-    my $orig_client_secret = $yv_obj->get_client_secret;
-
-    my $key           = $api->{key};
-    my $client_id     = $api->{client_id};
-    my $client_secret = $api->{client_secret};
-
-    if (defined($key)) {
-        $yv_obj->set_key($key) // do {
-            warn "[!] Invalid key: $key\n" if $key ne 'API_KEY';
-            $yv_obj->set_key($orig_key);
-        };
-    }
-    if (defined($client_id)) {
-        $yv_obj->set_client_id($client_id) // do {
-            warn "[!] Invalid client_id: $client_id\n" if $client_id ne 'CLIENT_ID';
-            $yv_obj->set_client_id($orig_client_id);
-        };
-    }
-    if (defined($client_secret)) {
-        $yv_obj->set_client_secret($client_secret) // do {
-            warn "[!] Invalid client_secret: $client_secret\n" if $client_secret ne 'CLIENT_SECRET';
-            $yv_obj->set_client_secret($orig_client_secret);
-        };
-    }
-}
-else {
-    open(my $fh, '>', $api_file) or warn "[!] Can't create file <<$api_file>>: $!\n";
-    print $fh <<"EOT";
-{
-    "key":           "API_KEY",
-    "client_id":     "CLIENT_ID",
-    "client_secret": "CLIENT_SECRET"
-}
-EOT
-    close $fh;
-}
-
-$yv_obj->load_authentication_tokens();
 
 require WWW::StrawViewer::Utils;
 my $yv_utils = WWW::StrawViewer::Utils->new(youtube_url_format => $opt{youtube_video_url},
@@ -2173,10 +2118,10 @@ sub rate_videos {
 
 sub get_and_play_video_ids {
     (my @ids = grep { get_valid_video_id($_) } @_) || return;
-    my $info = $yv_obj->video_details(join(',', @ids), VIDEO_PART);
+    my $info = $yv_obj->video_details(join(',', @ids));
 
     if ($yv_utils->has_entries($info)) {
-        if (not play_videos($info->{results}{items})) {
+        if (not play_videos([$info->{results}])) {
             return;
         }
     }
@@ -2200,7 +2145,7 @@ sub get_and_print_video_info {
     foreach my $id (@_) {
 
         my $videoID = get_valid_video_id($id) // next;
-        my $info    = $yv_obj->video_details($videoID, VIDEO_PART);
+        my $info    = $yv_obj->video_details($videoID);
 
         if ($yv_utils->has_entries($info)) {
             local $opt{show_video_info} = 1;

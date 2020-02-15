@@ -186,8 +186,9 @@ When C<$part> is C<undef>, it defaults to I<snippet>.
 =cut
 
 sub video_details {
-    my ($self, $id, $part) = @_;
-    return $self->_get_results($self->_make_videos_url(id => $id, part => $part // 'snippet'));
+    my ($self, $id, $fields) = @_;
+    $fields //= $self->basic_video_info_fields;
+    $self->_get_results($self->_make_feed_url("videos/$id", fields => $fields));
 }
 
 =head2 Return details

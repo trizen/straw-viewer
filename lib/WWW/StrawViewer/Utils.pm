@@ -228,12 +228,18 @@ sub has_entries {
             return scalar @{$result->{results}{comments}} > 0;
         }
 
-        if ($result->{results}{type} eq 'playlist') {
+        my $type = $result->{results}{type}//'';
+
+        if ($type eq 'playlist') {
             return $result->{results}{videoCount} > 0;
         }
     }
 
-    scalar(@{$result->{results}}) > 0;
+    if (ref($result->{results}) eq 'ARRAY') {
+        return scalar(@{$result->{results}}) > 0;
+    }
+
+    return 1;      # maybe?
     #ref($result) eq 'HASH' and ($result->{results}{pageInfo}{totalResults} > 0);
 }
 
@@ -530,7 +536,8 @@ sub get_channel_id {
 sub get_category_id {
     my ($self, $info) = @_;
     #$info->{snippet}{resourceId}{categoryId} // $info->{snippet}{categoryId};
-    "unknown";
+    #"unknown";
+    $info->{genre} // 'Unknown';
 }
 
 sub get_category_name {
@@ -554,7 +561,9 @@ sub get_category_name {
                          29 => 'Nonprofits & Activism',
                         };
 
-    $categories->{$self->get_category_id($info) // ''} // 'Unknown';
+    #$categories->{$self->get_category_id($info) // ''} // 'Unknown';
+
+    $info->{genre} // 'Unknown';
 }
 
 sub get_publication_date {
@@ -677,14 +686,12 @@ sub get_views_approx {
 
 sub get_likes {
     my ($self, $info) = @_;
-    #$info->{statistics}{likeCount};
-    0;
+    $info->{likeCount} // 0;
 }
 
 sub get_dislikes {
     my ($self, $info) = @_;
-    #$info->{statistics}{dislikeCount};
-    0;
+    $info->{dislikeCount} // 0;
 }
 
 sub get_comments {

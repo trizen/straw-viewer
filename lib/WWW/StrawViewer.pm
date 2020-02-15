@@ -130,6 +130,39 @@ sub _our_smartmatch {
     return 0;
 }
 
+sub basic_video_info_fields {
+    join(',',
+    qw(
+        title
+        videoId
+        description
+        published
+        publishedText
+        viewCount
+        likeCount
+        dislikeCount
+        genre
+        author
+        authorId
+        lengthSeconds
+        rating
+        liveNow
+    )
+    )
+}
+
+sub extra_video_info_fields {
+    my ($self) = @_;
+    join(',',
+        $self->basic_video_info_fields,
+        qw(
+            subCountText
+            captions
+            isFamilyFriendly
+        )
+    );
+}
+
 {
     no strict 'refs';
 

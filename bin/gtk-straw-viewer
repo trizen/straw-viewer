@@ -16,7 +16,7 @@
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
 #  Edit: 14 February 2020
-#  https://github.com/trizen/youtube-viewer
+#  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
 # This is a fork of youtube-viewer:
@@ -53,7 +53,7 @@ my $appname = 'GTK+ Straw Viewer';
 my $version = $WWW::StrawViewer::VERSION;
 
 # Share directory
-my $share_dir = $DEVEL ? '../share' : dist_dir('WWW-StrawViewer');
+my $share_dir = ($DEVEL and -d "../share") ? '../share' : dist_dir('WWW-StrawViewer');
 
 sub VIDEO_PART () { 'contentDetails,statistics,snippet' }
 
@@ -207,7 +207,10 @@ my %CONFIG = (
     regionCode      => undef,
 
     comments_width => 80,        # wrap comments longer than `n` characters
-    comments_order => 'time',    # valid values: time, relevance
+    comments_order => 'top',    # valid values: time, relevance
+
+    # API
+    api_host => "https://invidio.us",
 
     # URI options
     thumbnail_type       => 'medium',
@@ -240,8 +243,8 @@ my %CONFIG = (
     web_browser            => undef,                 # defaults to $ENV{WEBBROWSER} or xdg-open
     terminal               => undef,                 # autodetect it later
     terminal_exec          => q{-e '%s'},
-    youtube_viewer         => undef,
-    youtube_viewer_args    => [],
+    straw_viewer         => undef,
+    straw_viewer_args    => [],
     youtube_users_file     => $youtube_users_file,
     history                => 1,
     history_limit          => 100_000,
@@ -287,7 +290,7 @@ local $SIG{TERM} = \&on_mainw_destroy;
 local $SIG{INT}  = \&on_mainw_destroy;
 
 # Locating the .glade interface file and icons dir
-my $glade_file = catfile($share_dir, "gtk3-straw-viewer.glade");
+my $glade_file = catfile($share_dir, "gtk-straw-viewer.glade");
 my $icons_path = catdir($share_dir, 'icons');
 
 # Defining GUI
@@ -428,7 +431,7 @@ local $SIG{__DIE__} = sub {
 };
 
 #---------------------- LOAD IMAGES ----------------------#
-my $app_icon_pixbuf       = 'Gtk3::Gdk::Pixbuf'->new_from_file(catfile($icons_path, "logo.png"));
+my $app_icon_pixbuf       = 'Gtk3::Gdk::Pixbuf'->new_from_file(catfile($icons_path, "gtk-straw-viewer.png"));
 my $user_icon_pixbuf      = 'Gtk3::Gdk::Pixbuf'->new_from_file_at_size(catfile($icons_path, "user.png"), 16, 16);
 my $feed_icon_pixbuf      = 'Gtk3::Gdk::Pixbuf'->new_from_file_at_size(catfile($icons_path, "feed.png"), 16, 16);
 my $feed_icon_gray_pixbuf = 'Gtk3::Gdk::Pixbuf'->new_from_file_at_size(catfile($icons_path, "feed_gray.png"), 16, 16);
@@ -462,7 +465,7 @@ if (not defined $CONFIG{cache_dir}) {
         $cache_dir = catdir(curdir(), '.cache');
     }
 
-    $CONFIG{cache_dir} = catdir($cache_dir, 'youtube-viewer');
+    $CONFIG{cache_dir} = catdir($cache_dir, 'straw-viewer');
 }
 
 # Create the cache directory (if needed)
@@ -802,8 +805,8 @@ my %ResultsHistory = (
                       results => [],
                      );
 
-# Locate youtube-viewer
-$CONFIG{youtube_viewer} //= which_command('youtube-viewer') // 'youtube-viewer';
+# Locate CLI straw-viewer
+$CONFIG{straw_viewer} //= which_command('straw-viewer') // 'straw-viewer';
 
 my $yv_obj = WWW::StrawViewer->new(
                                      escape_utf8         => 1,
@@ -860,6 +863,7 @@ sub apply_configuration {
 
     foreach my $option_name (
                              qw(
+                             api_host
                              videoSyndicated comments_order
                              maxResults videoDimension
                              videoEmbeddable videoLicense
@@ -1342,11 +1346,11 @@ sub menu_popup {
             $menu->append($item);
         }
 
-        # Play with CLI youtube-viewer
+        # Play with CLI straw-viewer
         {
             my $item = 'Gtk3::ImageMenuItem'->new("Play in terminal");
-            $item->signal_connect(activate => \&play_selected_video_with_cli_youtube_viewer);
-            $item->set_property(tooltip_text => "Play with youtube-viewer in a new terminal");
+            $item->signal_connect(activate => \&play_selected_video_with_cli_straw_viewer);
+            $item->set_property(tooltip_text => "Play with straw-viewer in a new terminal");
             $item->set_image('Gtk3::Image'->new_from_icon_name("computer", q{menu}));
             $item->show;
             $menu->append($item);
@@ -1411,7 +1415,7 @@ $accel->connect(ord('l'), ['control-mask'], ['visible'], \&show_login_to_youtube
 $accel->connect(ord('p'), ['control-mask'], ['visible'], \&show_preferences_window);
 $accel->connect(ord('q'), ['control-mask'], ['visible'], \&on_mainw_destroy);
 $accel->connect(ord('u'), ['control-mask'], ['visible'], \&show_users_list_window);
-$accel->connect(ord('y'), ['control-mask'], ['visible'], \&run_cli_youtube_viewer);
+$accel->connect(ord('y'), ['control-mask'], ['visible'], \&run_cli_straw_viewer);
 $accel->connect(ord('d'), ['control-mask'], ['visible'], \&show_details_window);
 
 #$accel->connect(ord('c'), ['control-mask'], ['visible'], \&show_comments_window);
@@ -2375,7 +2379,7 @@ sub get_code {
               }
               : $type eq 'video' ? (
                                     $CONFIG{audio_only}
-                                    ? execute_cli_youtube_viewer("--id=$code")
+                                    ? execute_cli_straw_viewer("--id=$code")
                                     : play_video($yv_obj->parse_json_string($liststore->get($iter, 8)))
                                    )
               : ();
@@ -2520,8 +2524,8 @@ sub display_results {
     #my $info  = $results->{results} // {};
     my $items = $results->{results} // [];
 
-    use Data::Dump qw(pp);
-    pp $items;
+    #use Data::Dump qw(pp);
+    #pp $items;
 
     if (ref($items) eq 'HASH' and $items->{type} eq 'playlist') {
         $items = $items->{videos};
@@ -2842,11 +2846,7 @@ sub add_playlist_entry {
                   . '</i>');
 
     my $num_items_template = "<b>$symbols{numero}</b>  %d items\n";
-    my $num_items_text     = "";
-
-    if (defined($playlist->{videoCount})) {
-        $num_items_text = sprintf($num_items_template, $playlist->{videoCount});
-    }
+    my $num_items_text     = sprintf($num_items_template, $yv_utils->get_playlist_video_count($playlist));
 
     my $type_label = reflow_text("<b>$symbols{diamond}</b>  " . 'Playlist' . "\n" . $num_items_text);
 
@@ -3165,8 +3165,8 @@ sub clear_text {
     return 0;
 }
 
-sub run_cli_youtube_viewer {
-    execute_cli_youtube_viewer('--interactive');
+sub run_cli_straw_viewer {
+    execute_cli_straw_viewer('--interactive');
 }
 
 sub get_options_as_arguments {
@@ -3248,22 +3248,22 @@ sub enqueue_video {
 
 sub play_enqueued_videos {
     if (@VIDEO_QUEUE) {
-        execute_cli_youtube_viewer('--video-ids=' . join(q{,}, splice @VIDEO_QUEUE));
+        execute_cli_straw_viewer('--video-ids=' . join(q{,}, splice @VIDEO_QUEUE));
     }
     return 1;
 }
 
-sub play_selected_video_with_cli_youtube_viewer {
+sub play_selected_video_with_cli_straw_viewer {
     my ($code, $iter) = get_selected_entry_code();
     $code // return;
 
     my $type = $liststore->get($iter, 7);
 
     if ($type eq 'video') {
-        execute_cli_youtube_viewer("--video-id=$code");
+        execute_cli_straw_viewer("--video-id=$code");
     }
     elsif ($type eq 'playlist') {
-        execute_cli_youtube_viewer("--pp=$code");
+        execute_cli_straw_viewer("--pp=$code");
     }
     else {
         warn "Can't play $type: $code\n";
@@ -3272,7 +3272,7 @@ sub play_selected_video_with_cli_youtube_viewer {
     return 1;
 }
 
-sub execute_cli_youtube_viewer {
+sub execute_cli_straw_viewer {
     my @arguments = @_;
 
     my $command = join(
@@ -3281,21 +3281,21 @@ sub execute_cli_youtube_viewer {
                        sprintf(
                                $CONFIG{terminal_exec},
                                join(q{ },
-                                    $CONFIG{youtube_viewer}, get_options_as_arguments(),
-                                    @arguments,              @{$CONFIG{youtube_viewer_args}}),
+                                    $CONFIG{straw_viewer}, get_options_as_arguments(),
+                                    @arguments,              @{$CONFIG{straw_viewer_args}}),
                               )
                       );
     my $code = execute_external_program($command);
 
     say $command if $yv_obj->get_debug;
 
-    warn "youtube-viewer - exit code: $code\n" if $code != 0;
+    warn "straw-viewer - exit code: $code\n" if $code != 0;
     return 1;
 }
 
 sub download_video {
     my $code = get_selected_entry_code(type => 'video') // return;
-    execute_cli_youtube_viewer("--video-id=$code", '--download');
+    execute_cli_straw_viewer("--video-id=$code", '--download');
     return 1;
 }
 
@@ -3382,27 +3382,33 @@ sub display_comments {
     return 1 if ref($results) ne 'HASH';
 
     my $url      = $results->{url};
-    my $res      = $results->{results} // {};
-    my $comments = $res->{items} // [];
+    my $video_id = $results->{results}{videoId};
+    my $comments = $results->{results}{comments} // [];
 
     foreach my $comment (@{$comments}) {
-        my $snippet     = (($comment->{snippet} // next)->{topLevelComment} // next)->{snippet};
-        my $comment_age = $yv_utils->date_to_age($snippet->{publishedAt});
+
+        #use Data::Dump qw(pp);
+        #pp $comment;
+
+        #my $comment_age = $yv_utils->date_to_age($snippet->{publishedAt});
+        my $comment_id = $yv_utils->get_comment_id($comment);
+        my $comment_age = $yv_utils->get_publication_age_approx($comment);
+
         my $comment_text = reflow_text(
                                            "<big><b>"
-                                         . encode_entities($snippet->{authorDisplayName})
+                                         . encode_entities($yv_utils->get_author($comment))
                                          . "</b> ("
                                          . (
                                             $comment_age =~ /sec|min|hour|day/
                                             ? "$comment_age ago"
-                                            : $yv_utils->format_date($snippet->{publishedAt})
+                                            : $yv_utils->get_publication_date($comment)
                                            )
                                          . ") commented:</big>\n"
                                          . encode_entities(
                                                            wrap_text(
                                                                      i_tab => "\t",
                                                                      s_tab => "\t",
-                                                                     text  => [$snippet->{textDisplay} // 'Empty comment...'],
+                                                                     text  => [$yv_utils->get_comment_content($comment) // 'Empty comment...'],
                                                                     )
                                                           )
                                       );
@@ -3411,52 +3417,52 @@ sub display_comments {
         $feeds_liststore->set(
                               $iter,
                               0 => $comment_text,
-                              3 => $snippet->{videoId},
-                              4 => $comment->{snippet}{topLevelComment}{id},
+                              3 => $video_id,
+                              4 => $comment_id,
                              );
 
-        if (exists $comment->{replies}) {
-            foreach my $reply (reverse @{$comment->{replies}{comments}}) {
-                my $reply_age = $yv_utils->date_to_age($reply->{snippet}{publishedAt});
-                my $reply_text = reflow_text(
-                                                 "\t<big><b>"
-                                               . encode_entities($reply->{snippet}{authorDisplayName})
-                                               . "</b> ("
-                                               . (
-                                                  $reply_age =~ /sec|min|hour|day/
-                                                  ? "$reply_age ago"
-                                                  : $yv_utils->format_date($reply->{snippet}{publishedAt})
-                                                 )
-                                               . ") replied:</big>\n"
-                                               . encode_entities(
-                                                             wrap_text(
-                                                                 i_tab => "\t\t",
-                                                                 s_tab => "\t\t",
-                                                                 text => [$reply->{snippet}{textDisplay} // 'Empty comment...']
-                                                             )
-                                               )
-                                            );
+        #~ if (exists $comment->{replies}) {
+            #~ foreach my $reply (reverse @{$comment->{replies}{comments}}) {
+                #~ my $reply_age = $yv_utils->date_to_age($reply->{snippet}{publishedAt});
+                #~ my $reply_text = reflow_text(
+                                                 #~ "\t<big><b>"
+                                               #~ . encode_entities($reply->{snippet}{authorDisplayName})
+                                               #~ . "</b> ("
+                                               #~ . (
+                                                  #~ $reply_age =~ /sec|min|hour|day/
+                                                  #~ ? "$reply_age ago"
+                                                  #~ : $yv_utils->format_date($reply->{snippet}{publishedAt})
+                                                 #~ )
+                                               #~ . ") replied:</big>\n"
+                                               #~ . encode_entities(
+                                                             #~ wrap_text(
+                                                                 #~ i_tab => "\t\t",
+                                                                 #~ s_tab => "\t\t",
+                                                                 #~ text => [$reply->{snippet}{textDisplay} // 'Empty comment...']
+                                                             #~ )
+                                               #~ )
+                                            #~ );
 
-                my $iter = $feeds_liststore->append;
-                $feeds_liststore->set(
-                                      $iter,
-                                      0 => $reply_text,
-                                      3 => $reply->{snippet}{videoId},
-                                      4 => $reply->{id},
-                                     );
-            }
-        }
+                #~ my $iter = $feeds_liststore->append;
+                #~ $feeds_liststore->set(
+                                      #~ $iter,
+                                      #~ 0 => $reply_text,
+                                      #~ 3 => $reply->{snippet}{videoId},
+                                      #~ 4 => $reply->{id},
+                                     #~ );
+            #~ }
+        #~ }
     }
 
-    if (exists $res->{nextPageToken}) {
-        my $iter = $feeds_liststore->append;
-        $feeds_liststore->set(
-                              $iter,
-                              0 => "<big><b>LOAD MORE</b></big>",
-                              1 => $url,
-                              2 => $res->{nextPageToken},
-                             );
-    }
+    #~ if (exists $res->{nextPageToken}) {
+        #~ my $iter = $feeds_liststore->append;
+        #~ $feeds_liststore->set(
+                              #~ $iter,
+                              #~ 0 => "<big><b>LOAD MORE</b></big>",
+                              #~ 1 => $url,
+                              #~ 2 => $res->{nextPageToken},
+                             #~ );
+    #~ }
 
     return 1;
 }

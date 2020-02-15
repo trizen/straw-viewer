@@ -27,11 +27,11 @@ META.json
 META.yml
 README.md
 share/gtk-straw-viewer.desktop
-share/gtk3-straw-viewer.glade
+share/gtk-straw-viewer.glade
 share/icons/default_thumb.jpg
 share/icons/feed.png
 share/icons/feed_gray.png
-share/icons/logo.png
+share/icons/gtk-straw-viewer.png
 share/icons/spinner.gif
 share/icons/user.png
 t/00-load.t

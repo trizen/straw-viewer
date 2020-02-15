@@ -69,7 +69,7 @@ my %valid_options = (
     safeSearch        => {valid => [qw(none moderate strict)], default => undef},
     videoType         => {valid => [qw(any episode movie)],    default => undef},
 
-    comments_order      => {valid => [qw(time relevance)],                default => 'time'},
+    comments_order      => {valid => [qw(top new)],                default => 'top'},
     subscriptions_order => {valid => [qw(alphabetical relevance unread)], default => undef},
 
     # Misc
@@ -95,9 +95,10 @@ my %valid_options = (
     refresh_token => {valid => [qr/^.{15}/], default => undef},
 
     authentication_file => {valid => [qr/^./], default => undef},
+    api_host => {valid => [qr{^https?://}], default => "https://invidio.us"},
 
     # No input value allowed
-    feeds_url        => {valid => q[], default => 'https://invidio.us/api/v1/'},
+    api_path         => {valid => q[], default => '/api/v1/'},
     video_info_url   => {valid => q[], default => 'https://www.youtube.com/get_video_info'},
     oauth_url        => {valid => q[], default => 'https://accounts.google.com/o/oauth2/'},
     video_info_args  => {valid => q[], default => '?video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en'},
@@ -457,9 +458,14 @@ sub _append_url_args {
       : $url;
 }
 
+sub get_api_url {
+    my ($self) = @_;
+    join('', $self->get_api_host, $self->get_api_path);
+}
+
 sub _simple_feeds_url {
-    my ($self, $suburl, %args) = @_;
-    $self->get_feeds_url() . $suburl . '?' . $self->list_to_url_arguments(key => $self->get_key, %args);
+    my ($self, $path, %args) = @_;
+    $self->get_api_url . $path . '?' . $self->list_to_url_arguments(key => $self->get_key, %args);
 }
 
 =head2 default_arguments(%args)
@@ -486,7 +492,7 @@ sub default_arguments {
 sub _make_feed_url {
     my ($self, $path, %args) = @_;
     my $extra_args = $self->default_arguments(%args);
-    my $url = $self->get_feeds_url() . $path;
+    my $url = $self->get_api_url  . $path;
 
     if ($extra_args) {
         $url .= '?' . $extra_args;

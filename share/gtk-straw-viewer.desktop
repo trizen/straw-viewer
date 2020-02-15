@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=GTK Youtube Viewer
+Name=GTK Straw Viewer
 Version=1.0
 Comment=Search and play YouTube videos.
 Exec=gtk-straw-viewer

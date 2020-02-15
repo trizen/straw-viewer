@@ -222,8 +222,15 @@ Returns true if a given result has entries.
 sub has_entries {
     my ($self, $result) = @_;
 
-    if (ref($result->{results}) eq 'HASH' and $result->{results}{type} eq 'playlist') {
-        return $result->{results}{videoCount} > 0;
+    if (ref($result->{results}) eq 'HASH') {
+
+        if (exists $result->{results}{comments}) {
+            return scalar @{$result->{results}{comments}} > 0;
+        }
+
+        if ($result->{results}{type} eq 'playlist') {
+            return $result->{results}{videoCount} > 0;
+        }
     }
 
     scalar(@{$result->{results}}) > 0;
@@ -424,6 +431,11 @@ sub get_playlist_id {
     $info->{playlistId};
 }
 
+sub get_playlist_video_count {
+    my ($self, $info) = @_;
+    $info->{videoCount};
+}
+
 =head2 get_description($info)
 
 Get description.
@@ -488,6 +500,21 @@ sub get_channel_title {
     $info->{author};
 }
 
+sub get_author {
+    my ($self, $info) = @_;
+    $info->{author};
+}
+
+sub get_comment_id {
+    my ($self, $info) = @_;
+    $info->{commentId};
+}
+
+sub get_comment_content {
+    my ($self, $info) = @_;
+    $info->{content};
+}
+
 sub get_id {
     my ($self, $info) = @_;
     #$info->{id};
@@ -541,13 +568,13 @@ sub get_publication_date {
 
 sub get_publication_age {
     my ($self, $info) = @_;
-    $info->{publishedText} =~ s/\sago\z//r;;
+    ($info->{publishedText} // '') =~ s/\sago\z//r;;
 }
 
 sub get_publication_age_approx {
     my ($self, $info) = @_;
 
-    my $age = $self->get_publication_age($info);
+    my $age = $self->get_publication_age($info) // '';
 
     if ($age =~ /hour|min|sec/) {
         return "0d";
@@ -650,17 +677,20 @@ sub get_views_approx {
 
 sub get_likes {
     my ($self, $info) = @_;
-    $info->{statistics}{likeCount};
+    #$info->{statistics}{likeCount};
+    0;
 }
 
 sub get_dislikes {
     my ($self, $info) = @_;
-    $info->{statistics}{dislikeCount};
+    #$info->{statistics}{dislikeCount};
+    0;
 }
 
 sub get_comments {
     my ($self, $info) = @_;
-    $info->{statistics}{commentCount};
+    #$info->{statistics}{commentCount};
+    1;
 }
 
 {

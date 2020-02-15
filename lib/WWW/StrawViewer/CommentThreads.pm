@@ -36,15 +36,10 @@ Retrieve comments from a video ID.
 
 sub comments_from_video_id {
     my ($self, $video_id) = @_;
-    return
-      $self->_get_results(
-                          $self->_make_commentThreads_url(
-                                                          videoId    => $video_id,
-                                                          textFormat => 'plainText',
-                                                          order      => $self->get_comments_order,
-                                                          part       => 'snippet,replies'
-                                                         ),
-                          simple => 1,
+    $self->_get_results(
+                          $self->_make_feed_url("comments/$video_id",
+                                        sort_by      => $self->get_comments_order,
+                                ),
                          );
 }
 

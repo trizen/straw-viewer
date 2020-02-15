@@ -80,18 +80,7 @@ Get videos from a specific playlistID.
 
 sub videos_from_playlist_id {
     my ($self, $id) = @_;
-    return $self->_get_results($self->_make_playlistItems_url(playlistId => $id, part => 'contentDetails,snippet'));
-}
-
-=head2 videos_from_id($playlist_id)
-
-Get videos from a specific playlistID.
-
-=cut
-
-sub playlists_from_id {
-    my ($self, $id) = @_;
-    return $self->_get_results($self->_make_playlistItems_url(id => $id));
+    $self->_get_results($self->_make_feed_url("playlists/$id"));
 }
 
 =head2 favorites($channel_id)
@@ -120,22 +109,12 @@ Get the favorites, uploads and likes for a given YouTube username.
 
         *{__PACKAGE__ . '::' . $name . '_from_username'} = sub {
             my ($self, $username) = @_;
-            my $playlist_id = $self->get_playlist_id(
-                $name, $username
-                ? (forUsername => $username)
-                : do { $self->get_access_token() // return; (mine => 'true') }
-            ) // return;
-            $self->videos_from_playlist_id($playlist_id);
+            $self->videos_from_username($username);
         };
 
         *{__PACKAGE__ . '::' . $name} = sub {
             my ($self, $channel_id) = @_;
-            my $playlist_id = $self->get_playlist_id(
-                $name, ($channel_id and $channel_id ne 'mine')
-                ? (id => $channel_id)
-                : do { $self->get_access_token() // return; (mine => 'true') }
-            ) // return;
-            $self->videos_from_playlist_id($playlist_id);
+            $self->videos_from_channel_id($channel_id);
         };
     }
 }

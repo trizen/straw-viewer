@@ -2570,8 +2570,7 @@ sub print_channels {
     }
 
     my $url      = $results->{url};
-    my $info     = $results->{results} // {};
-    my $channels = $info->{items} // [];
+    my $channels     = $results->{results} // [];
 
     foreach my $i (0 .. $#{$channels}) {
         my $channel = $channels->[$i];
@@ -2579,7 +2578,7 @@ sub print_channels {
         if ($opt{results_with_details}) {
             printf(
                    "\n%s. %s\n    %s: %-23s %s: %-12s\n%s\n",
-                   colored(sprintf('%2d', $i + 1), 'bold') => colored($yv_utils->get_title($channel), 'bold blue'),
+                   colored(sprintf('%2d', $i + 1), 'bold') => colored($yv_utils->get_channel_title($channel), 'bold blue'),
                    colored('Updated' => 'bold') => $yv_utils->get_publication_date($channel),
                    colored('Author'  => 'bold') => $yv_utils->get_channel_title($channel),
                    wrap_text(
@@ -2593,7 +2592,7 @@ sub print_channels {
             print "\n" if $i == 0;
             printf("%s. %s (%s)\n",
                    colored(sprintf('%2d', $i + 1),                    'bold'),
-                   colored($yv_utils->get_title($channel),            'blue'),
+                   colored($yv_utils->get_channel_title($channel),            'blue'),
                    colored($yv_utils->get_publication_date($channel), 'magenta'),
                   );
         }
@@ -2612,7 +2611,7 @@ sub print_channels {
             foreach my $i (0 .. $#{$channels}) {
 
                 my $channel = $channels->[$i];
-                my $title   = clear_title($yv_utils->get_title($channel));
+                my $title   = clear_title($yv_utils->get_channel_title($channel));
 
                 printf "%s. %s %s [%*s]\n", colored(sprintf('%2d', $i + 1), 'bold'),
                   adjust_width($title, $title_length),
@@ -2642,7 +2641,7 @@ sub print_channels {
                                 sub  => __SUB__,
                                 url  => $url,
                                 res  => $channels,
-                                info => $info,
+                                info => $results,
                                )
               ) {
                 ## ok
@@ -2872,8 +2871,7 @@ sub print_playlists {
     }
 
     my $url       = $results->{url};
-    my $info      = $results->{results} // {};
-    my $playlists = $info->{items} // [];
+    my $playlists = $results->{results} // [];
 
     state $info_format = <<"FORMAT";
 
@@ -2965,7 +2963,7 @@ FORMAT
                                 sub  => __SUB__,
                                 url  => $url,
                                 res  => $playlists,
-                                info => $info,
+                                info => $results,
                                 mode => 'playlists',
                                )
               ) {
@@ -3637,6 +3635,11 @@ sub print_videos {
 
     my $url    = $results->{url};
     my $videos   = $results->{results} // [];
+
+    if (ref($videos) eq 'HASH' and exists $videos->{videos}) {
+        $videos = $videos->{videos};
+    }
+
     #my $videos = $info->{items} // [];
 
     #~ foreach my $entry (@$videos) {

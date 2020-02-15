@@ -23,6 +23,11 @@ sub _make_channels_url {
     return $self->_make_feed_url('channels', %opts);
 }
 
+sub videos_from_channel_id {
+    my ($self, $channel_id) = @_;
+    return $self->_get_results($self->_make_feed_url("channels/$channel_id/videos"));
+}
+
 =head2 channels_from_categoryID($category_id)
 
 Return the YouTube channels associated with the specified category.

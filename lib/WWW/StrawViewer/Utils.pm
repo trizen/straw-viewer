@@ -221,6 +221,11 @@ Returns true if a given result has entries.
 
 sub has_entries {
     my ($self, $result) = @_;
+
+    if (ref($result->{results}) eq 'HASH' and $result->{results}{type} eq 'playlist') {
+        return $result->{results}{videoCount} > 0;
+    }
+
     scalar(@{$result->{results}}) > 0;
     #ref($result) eq 'HASH' and ($result->{results}{pageInfo}{totalResults} > 0);
 }
@@ -450,6 +455,22 @@ Get thumbnail URL.
 
 sub get_thumbnail_url {
     my ($self, $info, $type) = @_;
+
+    if (exists $info->{videoId}) {
+        $info->{type} = 'video';
+    }
+
+    if ($info->{type} eq 'playlist') {
+        return $info->{playlistThumbnail};
+    }
+
+    if ($info->{type} eq 'channel') {
+        ref($info->{authorThumbnails}) eq 'ARRAY' or return '';
+        return $info->{authorThumbnails}[0]{url};
+    }
+
+    ref($info->{videoThumbnails}) eq 'ARRAY' or return '';
+
     my @thumbs =  @{$info->{videoThumbnails}};
     my @wanted = grep{$_->{quality} eq $type} @thumbs;
 
@@ -654,6 +675,10 @@ sub get_comments {
 
         *{__PACKAGE__ . '::' . 'is_' . $pair->[0]} = sub {
             my ($self, $item) = @_;
+
+            if ($pair->[0] eq 'video') {
+                return 1 if exists $item->{videoId};
+            }
 
             exists $pair->[1]{$item->{type} // ''};
 

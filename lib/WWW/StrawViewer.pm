@@ -485,7 +485,14 @@ sub default_arguments {
 
 sub _make_feed_url {
     my ($self, $path, %args) = @_;
-    $self->get_feeds_url() . $path . '?' . $self->default_arguments(%args);
+    my $extra_args = $self->default_arguments(%args);
+    my $url = $self->get_feeds_url() . $path;
+
+    if ($extra_args) {
+        $url .= '?' . $extra_args;
+    }
+
+    return $url;
 }
 
 sub _extract_from_invidious {

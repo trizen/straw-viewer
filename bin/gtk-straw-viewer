@@ -2523,6 +2523,10 @@ sub display_results {
     use Data::Dump qw(pp);
     pp $items;
 
+    if (ref($items) eq 'HASH' and $items->{type} eq 'playlist') {
+        $items = $items->{videos};
+    }
+
     hide_feeds_window();
 
     #~ if (not $from_history) {
@@ -2596,7 +2600,7 @@ sub display_results {
 
         if ($yv_utils->is_playlist($item)) {
 
-            my $playlist_id = $yv_utils->get_playlist_id($item) || next;
+            #~ my $playlist_id = $yv_utils->get_playlist_id($item) || next;
 
             #~ if (exists($info->{__extra_info__}{$playlist_id})) {
                 #~ @{$item}{qw(contentDetails)} =
@@ -2613,7 +2617,7 @@ sub display_results {
         }
         elsif ($yv_utils->is_video($item)) {
 
-            my $video_id = $yv_utils->get_video_id($item) || next;
+            #~ my $video_id = $yv_utils->get_video_id($item) || next;
 
             #~ if (exists($info->{__extra_info__}{$video_id})) {
                 #~ @{$item}{qw(id contentDetails statistics snippet)} =
@@ -2773,7 +2777,7 @@ sub add_channel_entry {
     my ($channel) = @_;
 
     my $iter            = $liststore->append;
-    my $title           = $yv_utils->get_title($channel);
+    my $title           = $yv_utils->get_channel_title($channel);
     my $channel_id      = $yv_utils->get_channel_id($channel);
     my $description     = $yv_utils->get_description($channel);
     my $row_description = make_row_description($description);
@@ -2840,8 +2844,8 @@ sub add_playlist_entry {
     my $num_items_template = "<b>$symbols{numero}</b>  %d items\n";
     my $num_items_text     = "";
 
-    if (defined($playlist->{contentDetails}{itemCount})) {
-        $num_items_text = sprintf($num_items_template, $playlist->{contentDetails}->{itemCount});
+    if (defined($playlist->{videoCount})) {
+        $num_items_text = sprintf($num_items_template, $playlist->{videoCount});
     }
 
     my $type_label = reflow_text("<b>$symbols{diamond}</b>  " . 'Playlist' . "\n" . $num_items_text);
@@ -2865,6 +2869,7 @@ sub list_playlist {
     my ($playlist_id) = @_;
 
     my $results = $yv_obj->videos_from_playlist_id($playlist_id);
+
     if ($yv_utils->has_entries($results)) {
         $liststore->clear if $CONFIG{clear_search_list};
         display_results($results);
@@ -3575,37 +3580,39 @@ sub set_entry_details {
 
     my $info = $yv_obj->parse_json_string($liststore->get($iter, 8));
 
-    # Getting thumbs
-    foreach my $nr (qw(1 2 3)) {
+    my %thumbs = (
+        start => 1,
+        middle => 2,
+        end => 3,
+    );
 
-        $gui->get_object("image$nr")->set_from_pixbuf($default_thumb);
+    # Getting thumbs
+    foreach my $type (keys %thumbs) {
+
+        $gui->get_object("image$thumbs{$type}")->set_from_pixbuf($default_thumb);
 
         Glib::Idle->add(
             sub {
-                my ($nr) = @{$_[0]};
+                my ($type) = @{$_[0]};
 
-                if ($code =~ /$valid_video_id_re/) {
+                my $url = $yv_utils->get_thumbnail_url($info, $type);
 
-                    my $thumbnail = $info->{snippet}{thumbnails}{medium};
-                    my $url       = $thumbnail->{url};
+                    #~ my $thumbnail = $info->{snippet}{thumbnails}{medium};
+                    #~ my $url       = $thumbnail->{url};
 
                     if ($url =~ /_live\.\w+\z/) {
                         ## no extra thumbnails available while video is LIVE
                     }
                     else {
-                        $url =~ s{/\w+\.(\w+)\z}{/mq$nr.$1};
+                        $url =~ s{/\w+\.(\w+)\z}{/mq$thumbs{$type}.$1};
                     }
 
                     my $pixbuf = get_pixbuf_thumbnail_from_url($url, 160, 90);
-                    $gui->get_object("image$nr")->set_from_pixbuf($pixbuf);
-                }
-                else {
-                    $gui->get_object("image$nr")->set_from_pixbuf($default_thumb);
-                }
+                    $gui->get_object("image$thumbs{$type}")->set_from_pixbuf($pixbuf);
 
                 return 0;
             },
-            [$nr],
+            [$type],
             Glib::G_PRIORITY_DEFAULT_IDLE
                        );
     }

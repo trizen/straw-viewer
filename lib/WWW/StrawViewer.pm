@@ -271,6 +271,7 @@ sub set_lwp_useragent {
 
     $self->{lwp} = $lwp->new(
 
+        cookie_jar => {},       # temporary cookies
         timeout       => $self->get_lwp_timeout,
         show_progress => $self->get_debug,
         agent         => $self->get_lwp_agent,
@@ -284,7 +285,7 @@ sub set_lwp_useragent {
                my ($response) = @_;
                my $code = $response->code;
 
-               $code >= 400                                # do not cache any bad response
+               $code >= 300                                # do not cache any bad response
                  or $response->request->method ne 'GET'    # cache only GET requests
 
                  # don't cache if "cache-control" specifies "max-age=0" or "no-store"

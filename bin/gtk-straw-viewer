@@ -29,13 +29,12 @@ use warnings;
 no warnings 'once';
 
 my $DEVEL;    # true in devel mode
-use if ($DEVEL = 0), lib => qw(../lib);    # devel only
+use if ($DEVEL = 1), lib => qw(../lib);    # devel only
 
 use WWW::StrawViewer v0.0.1;
 use WWW::StrawViewer::RegularExpressions;
 
 use Gtk3 qw(-init);
-use File::ShareDir qw(dist_dir);
 use File::Spec::Functions qw(
   rel2abs
   catdir
@@ -53,7 +52,10 @@ my $appname = 'GTK+ Straw Viewer';
 my $version = $WWW::StrawViewer::VERSION;
 
 # Share directory
-my $share_dir = ($DEVEL and -d "../share") ? '../share' : dist_dir('WWW-StrawViewer');
+my $share_dir =
+    ($DEVEL and -d "../share")
+    ? '../share'
+    : do { require File::ShareDir; File::ShareDir::dist_dir('WWW-StrawViewer') };
 
 # Configuration dir/file
 my $home_dir;

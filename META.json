@@ -1,0 +1,121 @@
+{
+   "abstract" : "A very easy interface to YouTube, using the API of invidio.us.",
+   "author" : [
+      "Trizen <echo dHJpemVuQHByb3Rvbm1haWwuY29tCg== | base64 -d>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-StrawViewer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "0",
+            "LWP::UserAgent::Cached" : "0",
+            "Mozilla::CA" : "0",
+            "Term::ReadLine::Gnu::XS" : "0"
+         },
+         "requires" : {
+            "Data::Dump" : "0",
+            "Encode" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadLine" : "0",
+            "Text::ParseWords" : "0",
+            "Text::Wrap" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.016"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::StrawViewer" : {
+         "file" : "lib/WWW/StrawViewer.pm",
+         "version" : "v3.7.4"
+      },
+      "WWW::StrawViewer::Activities" : {
+         "file" : "lib/WWW/StrawViewer/Activities.pm"
+      },
+      "WWW::StrawViewer::Authentication" : {
+         "file" : "lib/WWW/StrawViewer/Authentication.pm"
+      },
+      "WWW::StrawViewer::Channels" : {
+         "file" : "lib/WWW/StrawViewer/Channels.pm"
+      },
+      "WWW::StrawViewer::CommentThreads" : {
+         "file" : "lib/WWW/StrawViewer/CommentThreads.pm"
+      },
+      "WWW::StrawViewer::GetCaption" : {
+         "file" : "lib/WWW/StrawViewer/GetCaption.pm"
+      },
+      "WWW::StrawViewer::GuideCategories" : {
+         "file" : "lib/WWW/StrawViewer/GuideCategories.pm"
+      },
+      "WWW::StrawViewer::Itags" : {
+         "file" : "lib/WWW/StrawViewer/Itags.pm"
+      },
+      "WWW::StrawViewer::ParseJSON" : {
+         "file" : "lib/WWW/StrawViewer/ParseJSON.pm"
+      },
+      "WWW::StrawViewer::ParseXML" : {
+         "file" : "lib/WWW/StrawViewer/ParseXML.pm"
+      },
+      "WWW::StrawViewer::PlaylistItems" : {
+         "file" : "lib/WWW/StrawViewer/PlaylistItems.pm"
+      },
+      "WWW::StrawViewer::Playlists" : {
+         "file" : "lib/WWW/StrawViewer/Playlists.pm"
+      },
+      "WWW::StrawViewer::RegularExpressions" : {
+         "file" : "lib/WWW/StrawViewer/RegularExpressions.pm"
+      },
+      "WWW::StrawViewer::Search" : {
+         "file" : "lib/WWW/StrawViewer/Search.pm"
+      },
+      "WWW::StrawViewer::Subscriptions" : {
+         "file" : "lib/WWW/StrawViewer/Subscriptions.pm"
+      },
+      "WWW::StrawViewer::Utils" : {
+         "file" : "lib/WWW/StrawViewer/Utils.pm"
+      },
+      "WWW::StrawViewer::VideoCategories" : {
+         "file" : "lib/WWW/StrawViewer/VideoCategories.pm"
+      },
+      "WWW::StrawViewer::Videos" : {
+         "file" : "lib/WWW/StrawViewer/Videos.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v3.7.4",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

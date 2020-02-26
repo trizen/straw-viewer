@@ -20,7 +20,7 @@ use parent qw(
 
 =head1 NAME
 
-WWW::StrawViewer - A very easy interface to YouTube.
+WWW::StrawViewer - A very easy interface to YouTube, using the API of invidio.us.
 
 =cut
 

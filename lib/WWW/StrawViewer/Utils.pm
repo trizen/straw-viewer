@@ -593,6 +593,10 @@ sub get_publication_age_approx {
         return "$1d";
     }
 
+    if ($age =~ /^(\d+) week/) {
+        return "$1w";
+    }
+
     if ($age =~ /^(\d+) month/) {
         return "$1m";
     }

@@ -222,7 +222,6 @@ my %CONFIG = (
 
     # Others
     autoplay_mode        => 0,
-    use_invidious_api    => 0,
     http_proxy           => undef,
     env_proxy            => 1,
     confirm              => 0,
@@ -613,7 +612,6 @@ my $yv_obj = WWW::StrawViewer->new(
                                      config_dir          => $config_dir,
                                      cache_dir           => $opt{cache_dir},
                                      lwp_env_proxy       => $opt{env_proxy},
-                                     use_invidious_api   => $opt{use_invidious_api},
                                      authentication_file => $authentication_file,
                                     );
 
@@ -1105,7 +1103,7 @@ sub apply_configuration {
                              publishedAfter publishedBefore
                              safeSearch regionCode debug hl
                              http_proxy page comments_order
-                             subscriptions_order use_invidious_api
+                             subscriptions_order
                              )
       ) {
 

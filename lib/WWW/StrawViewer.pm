@@ -69,7 +69,7 @@ my %valid_options = (
     safeSearch        => {valid => [qw(none moderate strict)], default => undef},
     videoType         => {valid => [qw(any episode movie)],    default => undef},
 
-    comments_order      => {valid => [qw(top new)],                default => 'top'},
+    comments_order      => {valid => [qw(top new)],                       default => 'top'},
     subscriptions_order => {valid => [qw(alphabetical relevance unread)], default => undef},
 
     # Misc
@@ -84,8 +84,6 @@ my %valid_options = (
     prefer_mp4    => {valid => [1, 0], default => 0},
     prefer_av1    => {valid => [1, 0], default => 0},
 
-    use_invidious_api => {valid => [1, 0], default => 0},
-
     # API/OAuth
     key           => {valid => [qr/^.{15}/], default => undef},
     client_id     => {valid => [qr/^.{15}/], default => undef},
@@ -94,8 +92,8 @@ my %valid_options = (
     access_token  => {valid => [qr/^.{15}/], default => undef},
     refresh_token => {valid => [qr/^.{15}/], default => undef},
 
-    authentication_file => {valid => [qr/^./], default => undef},
-    api_host => {valid => [qr{^https?://}], default => "https://invidio.us"},
+    authentication_file => {valid => [qr/^./],         default => undef},
+    api_host            => {valid => [qr{^https?://}], default => "https://invidio.us"},
 
     # No input value allowed
     api_path         => {valid => q[], default => '/api/v1/'},
@@ -131,36 +129,38 @@ sub _our_smartmatch {
 }
 
 sub basic_video_info_fields {
-    join(',',
-    qw(
-        title
-        videoId
-        description
-        published
-        publishedText
-        viewCount
-        likeCount
-        dislikeCount
-        genre
-        author
-        authorId
-        lengthSeconds
-        rating
-        liveNow
-    )
-    )
+    join(
+        ',',
+        qw(
+          title
+          videoId
+          description
+          published
+          publishedText
+          viewCount
+          likeCount
+          dislikeCount
+          genre
+          author
+          authorId
+          lengthSeconds
+          rating
+          liveNow
+          )
+        );
 }
 
 sub extra_video_info_fields {
     my ($self) = @_;
-    join(',',
+    join(
+        ',',
         $self->basic_video_info_fields,
         qw(
-            subCountText
-            captions
-            isFamilyFriendly
-        )
-    );
+          subCountText
+          captions
+          isFamilyFriendly
+          )
+        );
 }
 
 {
@@ -275,7 +275,7 @@ sub set_lwp_useragent {
         show_progress => $self->get_debug,
         agent         => $self->get_lwp_agent,
 
-        ssl_opts      => {verify_hostname => 1, SSL_version => 'TLSv1_2'},
+        ssl_opts => {verify_hostname => 1, SSL_version => 'TLSv1_2'},
 
         $lwp eq 'LWP::UserAgent::Cached'
         ? (
@@ -511,13 +511,14 @@ sub default_arguments {
     my ($self, %args) = @_;
 
     my %defaults = (
-                    #key         => $self->get_key,
-                    #part        => 'snippet',
-                    #prettyPrint => 'false',
-                    #maxResults  => $self->get_maxResults,
-                    #regionCode  => $self->get_regionCode,
-                    %args,
-                   );
+
+        #key         => $self->get_key,
+        #part        => 'snippet',
+        #prettyPrint => 'false',
+        #maxResults  => $self->get_maxResults,
+        #regionCode  => $self->get_regionCode,
+        %args,
+    );
 
     $self->list_to_url_arguments(%defaults);
 }
@@ -525,7 +526,7 @@ sub default_arguments {
 sub _make_feed_url {
     my ($self, $path, %args) = @_;
     my $extra_args = $self->default_arguments(%args);
-    my $url = $self->get_api_url  . $path;
+    my $url        = $self->get_api_url . $path;
 
     if ($extra_args) {
         $url .= '?' . $extra_args;
@@ -565,10 +566,14 @@ sub _extract_from_invidious {
     return @formats;
 }
 
+sub _ytdl_is_available {
+    (state $x = system('youtube-dl', '--version')) == 0;
+}
+
 sub _extract_from_ytdl {
     my ($self, $videoID) = @_;
 
-    ((state $x = system('youtube-dl', '--version')) == 0) || return;
+    $self->_ytdl_is_available() || return;
 
     my $json = $self->proxy_stdout('youtube-dl', '--all-formats', '--dump-single-json',
                                    quotemeta("https://www.youtube.com/watch?v=" . $videoID));
@@ -599,30 +604,30 @@ sub _fallback_extract_urls {
 
     my @formats;
 
-    if ($self->get_use_invidious_api) {    # use the API of invidio.us
-
+    if ($self->_ytdl_is_available) {
         if ($self->get_debug) {
-            say STDERR ":: Using invidio.us to extract the streaming URLs...";
+            say STDERR ":: Using youtube-dl to extract the streaming URLs...";
         }
 
-        push @formats, $self->_extract_from_invidious($videoID);
+        push @formats, $self->_extract_from_ytdl($videoID);
 
         if ($self->get_debug) {
-            say STDERR ":: Found ", scalar(@formats), " streaming URLs.";
+            my $count = scalar(@formats);
+            say STDERR ":: Found $count streaming URLs...";
         }
 
-        @formats && return @formats;
+        return @formats;
     }
 
+    # Use the API of invidio.us
     if ($self->get_debug) {
-        say STDERR ":: Using youtube-dl to extract the streaming URLs...";
+        say STDERR ":: Using invidio.us to extract the streaming URLs...";
     }
 
-    push @formats, $self->_extract_from_ytdl($videoID);
+    push @formats, $self->_extract_from_invidious($videoID);
 
     if ($self->get_debug) {
-        my $count = scalar(@formats);
-        say STDERR ":: Found $count streaming URLs...";
+        say STDERR ":: Found ", scalar(@formats), " streaming URLs.";
     }
 
     return @formats;

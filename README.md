@@ -14,9 +14,13 @@ A lightweight application for searching and streaming videos from YouTube, using
 
 ![gtk-straw-viewer](https://user-images.githubusercontent.com/614513/73087694-93ffdb80-3edb-11ea-8fea-05901d72f68d.png)
 
+### STATUS
+
+The project is in its early development stages and some features are not implemented yet.
+
 ### AVAILABILITY
 
-Under development.
+* Arch Linux (AUR): https://aur.archlinux.org/packages/straw-viewer-git/
 
 ### INSTALLATION
 

@@ -218,10 +218,10 @@ my %CONFIG = (
 
     # Subtitle options
     srt_languages => ['en', 'es'],
-    captions_dir  => tmpdir(),
     get_captions  => 1,
     auto_captions => 0,
-    cache_dir     => undef,          # will be defined later
+    captions_dir  => catdir(tmpdir(), 'straw-viewer'),
+    cache_dir     => catdir(tmpdir(), 'straw-viewer'),
 
     # Others
     env_proxy   => 1,
@@ -464,11 +464,11 @@ if (not defined $CONFIG{cache_dir}) {
     $CONFIG{cache_dir} = catdir($cache_dir, 'straw-viewer');
 }
 
-# Create the cache directory (if needed)
-if (not -d $CONFIG{cache_dir}) {
+foreach my $path($CONFIG{cache_dir}, $CONFIG{captions_dir}) {
+    next if -d $path;
     require File::Path;
-    File::Path::make_path($CONFIG{cache_dir})
-      or warn "[!] Can't create dir `$CONFIG{cache_dir}': $!";
+    File::Path::make_path($path)
+      or warn "[!] Can't create path <<$path>>: $!";
 }
 
 {
@@ -2524,7 +2524,7 @@ sub display_results {
     #use Data::Dump qw(pp);
     #pp $items;
 
-    if (ref($items) eq 'HASH' and $items->{type} eq 'playlist') {
+    if (ref($items) eq 'HASH') {
         $items = $items->{videos};
     }
 

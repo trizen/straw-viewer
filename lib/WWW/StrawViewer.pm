@@ -284,8 +284,7 @@ sub set_lwp_useragent {
                my ($response) = @_;
                my $code = $response->code;
 
-               $code >= 500                                # do not cache any bad response
-                 or $code == 401                           # don't cache an unauthorized response
+               $code >= 400                                # do not cache any bad response
                  or $response->request->method ne 'GET'    # cache only GET requests
 
                  # don't cache if "cache-control" specifies "max-age=0" or "no-store"

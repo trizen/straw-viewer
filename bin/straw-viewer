@@ -211,11 +211,11 @@ my %CONFIG = (
 
     # Subtitle options
     srt_languages => ['en', 'es'],
-    captions_dir  => tmpdir(),
     get_captions  => 1,
     auto_captions => 0,
     copy_caption  => 0,
-    cache_dir     => undef,          # auto-defined
+    captions_dir  => catdir(tmpdir(), 'straw-viewer'),
+    cache_dir     => catdir(tmpdir(), 'straw-viewer'),
 
     # API
     api_host => "https://invidio.us",
@@ -552,12 +552,12 @@ sub load_config {
 
     dump_configuration($config_file) if $update_config;
 
-    # Create the cache directory (if needed)
-    if (not -d $CONFIG{cache_dir}) {
-        require File::Path;
-        File::Path::make_path($CONFIG{cache_dir})
-          or warn "[!] Can't create dir `$CONFIG{cache_dir}': $!";
-    }
+foreach my $path($CONFIG{cache_dir}, $CONFIG{captions_dir}) {
+    next if -d $path;
+    require File::Path;
+    File::Path::make_path($path)
+      or warn "[!] Can't create path <<$path>>: $!";
+}
 
     @opt{keys %CONFIG} = values(%CONFIG);
 }

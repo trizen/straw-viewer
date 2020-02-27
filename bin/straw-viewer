@@ -2273,9 +2273,14 @@ sub general_options {
         main_quit(0);
     }
     elsif ($option =~ /^(?:n|next)\z/ and defined $url) {
-        if (defined $token) {
-            my $request = $yv_obj->next_page_with_token($url, $token);
-            $callback->($request);
+        if (exists $args{token}) {
+            if (defined $token) {
+                my $request = $yv_obj->next_page_with_token($url, $token);
+                $callback->($request);
+            }
+            else {
+                warn_last_page();
+            }
         }
         else {
             my $request = $yv_obj->next_page($url);
@@ -2628,7 +2633,7 @@ sub print_comments {
 
     my $url      = $results->{url};
     my $comments = $results->{results}{comments} // [];
-    my $token = $results->{results}{continuation} // [];
+    my $token = $results->{results}{continuation};
 
     my $i = 0;
     foreach my $comment (@{$comments}) {

@@ -3382,7 +3382,7 @@ sub display_comments {
     my $url      = $results->{url};
     my $video_id = $results->{results}{videoId};
     my $comments = $results->{results}{comments} // [];
-    my $continuation = $results->{results}{continuation} // [];
+    my $continuation = $results->{results}{continuation};
 
     foreach my $comment (@{$comments}) {
 

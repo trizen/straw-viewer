@@ -3304,9 +3304,9 @@ sub comments_row_activated {
 
     if (defined($url) and $url =~ m{^https?://}) {    # load more comments
 
-        #my $token = $feeds_liststore->get($iter, 2);
+        my $token = $feeds_liststore->get($iter, 2);
         $feeds_liststore->remove($iter);
-        my $results = $yv_obj->next_page($url);
+        my $results = $yv_obj->next_page_with_token($url, $token);
 
         if ($yv_utils->has_entries($results)) {
             display_comments($results);
@@ -3382,6 +3382,7 @@ sub display_comments {
     my $url      = $results->{url};
     my $video_id = $results->{results}{videoId};
     my $comments = $results->{results}{comments} // [];
+    my $continuation = $results->{results}{continuation} // [];
 
     foreach my $comment (@{$comments}) {
 
@@ -3452,15 +3453,15 @@ sub display_comments {
         #~ }
     }
 
-    #~ if (exists $res->{nextPageToken}) {
-        #~ my $iter = $feeds_liststore->append;
-        #~ $feeds_liststore->set(
-                              #~ $iter,
-                              #~ 0 => "<big><b>LOAD MORE</b></big>",
-                              #~ 1 => $url,
-                              #~ 2 => $res->{nextPageToken},
-                             #~ );
-    #~ }
+     if (defined $continuation) {
+        my $iter = $feeds_liststore->append;
+        $feeds_liststore->set(
+                              $iter,
+                              0 => "<big><b>LOAD MORE</b></big>",
+                              1 => $url,
+                              2 => $continuation,
+                             );
+    }
 
     return 1;
 }

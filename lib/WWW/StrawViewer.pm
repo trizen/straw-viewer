@@ -998,6 +998,20 @@ sub post_as_json {
     $self->_save('POST', $url, $json_str);
 }
 
+sub next_page_with_token {
+    my ($self, $url, $token) = @_;
+
+    my $pt_url = (
+                    $url =~ s{[?&]continuation=\K([^&]+)}{$token}
+                  ? $url
+                  : $self->_append_url_args($url, continuation => $token)
+                 );
+
+    my $res = $self->_get_results($pt_url);
+    $res->{url} = $pt_url;
+    return $res;
+}
+
 sub next_page {
     my ($self, $url) = @_;
 

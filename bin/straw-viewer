@@ -2263,6 +2263,7 @@ sub general_options {
     my $callback = $args{sub};
     my $results  = $args{res};
     my $info     = $args{info};
+    my $token   = $args{token};
 
     if (not defined($option)) {
         return;
@@ -2272,25 +2273,21 @@ sub general_options {
         main_quit(0);
     }
     elsif ($option =~ /^(?:n|next)\z/ and defined $url) {
-        if (defined $info->{nextPageToken}) {
-            my $request = $yv_obj->next_page($url, $info->{nextPageToken});
+        if (defined $token) {
+            my $request = $yv_obj->next_page_with_token($url, $token);
             $callback->($request);
         }
         else {
-            warn_last_page();
+            my $request = $yv_obj->next_page($url);
+            $callback->($request);
         }
+    }
+    elsif ($option =~ /^(?:b|back|p|prev|previous)\z/ and defined $url) {
+        my $request = $yv_obj->previous_page($url);
+        $callback->($request);
     }
     elsif ($option =~ /^(?:R|refresh)\z/ and defined $url) {
         @{$results} = @{$yv_obj->_get_results($url)->{results}{items}};
-    }
-    elsif ($option =~ /^(?:b|back|p|prev|previous)\z/ and defined $url) {
-        if (defined $info->{prevPageToken}) {
-            my $request = $yv_obj->previous_page($url, $info->{prevPageToken});
-            $callback->($request);
-        }
-        else {
-            warn_first_page();
-        }
     }
     elsif ($option eq 'login') {
         authenticate();
@@ -2631,6 +2628,7 @@ sub print_comments {
 
     my $url      = $results->{url};
     my $comments = $results->{results}{comments} // [];
+    my $token = $results->{results}{continuation} // [];
 
     my $i = 0;
     foreach my $comment (@{$comments}) {
@@ -2689,6 +2687,7 @@ sub print_comments {
                                 info => $results,
                                 mode => 'comments',
                                 args => [$videoID],
+                                token => $token,
                                )
               ) {
                 ## ok

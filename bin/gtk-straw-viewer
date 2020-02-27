@@ -2395,9 +2395,9 @@ sub make_row_description {
 }
 
 sub append_next_page {
-    my ($url, $token) = @_;
+    my ($url) = @_;
 
-    $token // return;    # no next page is available
+    #$token // return;    # no next page is available
 
     my $iter = $liststore->append;
 
@@ -2405,7 +2405,6 @@ sub append_next_page {
                     $iter,
                     0 => "<big><b>LOAD MORE</b></big>",
                     3 => $url,
-                    5 => $token,
                     7 => 'next_page',
                    );
 }
@@ -3305,9 +3304,9 @@ sub comments_row_activated {
 
     if (defined($url) and $url =~ m{^https?://}) {    # load more comments
 
-        my $token = $feeds_liststore->get($iter, 2);
+        #my $token = $feeds_liststore->get($iter, 2);
         $feeds_liststore->remove($iter);
-        my $results = $yv_obj->next_page($url, $token);
+        my $results = $yv_obj->next_page($url);
 
         if ($yv_utils->has_entries($results)) {
             display_comments($results);

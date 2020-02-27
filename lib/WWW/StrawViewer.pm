@@ -271,7 +271,7 @@ sub set_lwp_useragent {
 
     $self->{lwp} = $lwp->new(
 
-        cookie_jar => {},       # temporary cookies
+        cookie_jar    => {},                       # temporary cookies
         timeout       => $self->get_lwp_timeout,
         show_progress => $self->get_debug,
         agent         => $self->get_lwp_agent,
@@ -998,26 +998,37 @@ sub post_as_json {
     $self->_save('POST', $url, $json_str);
 }
 
+sub next_page {
+    my ($self, $url) = @_;
+
+    my $pt_url = (
+                    $url =~ s{[?&]page=\K(\d+)}{$1+1}e
+                  ? $url
+                  : $self->_append_url_args($url, page => 2)
+                 );
+
+    my $res = $self->_get_results($pt_url);
+    $res->{url} = $pt_url;
+    return $res;
+}
+
+sub previous_page {
+    my ($self, $url) = @_;
+
+    my $pt_url = (
+                    $url =~ s{[?&]page=\K(\d+)}{($1 > 2) ? ($1-1) : 1}e
+                  ? $url
+                  : $url
+                 );
+
+    my $res = $self->_get_results($pt_url);
+    $res->{url} = $pt_url;
+    return $res;
+}
+
 # SUBROUTINE FACTORY
 {
     no strict 'refs';
-
-    # Create {next,previous}_page subroutines
-    foreach my $name ('next_page', 'previous_page') {
-        *{__PACKAGE__ . '::' . $name} = sub {
-            my ($self, $url, $token) = @_;
-
-            my $pt_url = (
-                            $url =~ s/[?&]pageToken=\K[^&]+/$token/
-                          ? $url
-                          : $self->_append_url_args($url, pageToken => $token)
-                         );
-
-            my $res = $self->_get_results($pt_url);
-            $res->{url} = $pt_url;
-            return $res;
-        };
-    }
 
     # Create proxy_{exec,system} subroutines
     foreach my $name ('exec', 'system', 'stdout') {

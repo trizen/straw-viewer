@@ -16,7 +16,7 @@ A lightweight application for searching and streaming videos from YouTube, using
 
 ### STATUS
 
-The project is in its early development stages and some features are not implemented yet.
+The project is in its early stages of development and some features are not implemented yet.
 
 ### AVAILABILITY
 

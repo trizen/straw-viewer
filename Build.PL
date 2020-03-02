@@ -57,7 +57,6 @@ my $builder = Module::Build->new(
            'File::ShareDir' => 0,
            'Storable'       => 0,
            'Digest::MD5'    => 0,
-           'List::Util'     => 1.43,
           )
         : (),
     },

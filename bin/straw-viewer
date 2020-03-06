@@ -2823,6 +2823,16 @@ sub print_playlists {
     my $url       = $results->{url};
     my $playlists = $results->{results} // [];
 
+    if (ref($playlists) eq 'HASH') {
+        if (exists $playlists->{playlists}) {
+            $playlists = $playlists->{playlists};
+        }
+        else {
+            warn "\n[!] No playlists...\n";
+            $playlists = [];
+        }
+    }
+
     state $info_format = <<"FORMAT";
 
 TITLE: %s

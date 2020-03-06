@@ -2534,7 +2534,17 @@ sub display_results {
     #pp $items;
 
     if (ref($items) eq 'HASH') {
-        $items = $items->{videos};
+
+        if (exists $items->{videos}) {
+            $items = $items->{videos};
+        }
+        elsif (exists $items->{playlists}) {
+            $items = $items->{playlists};
+        }
+        else {
+            warn "[!] No results...\n";
+            $items = [];
+        }
     }
 
     hide_feeds_window();

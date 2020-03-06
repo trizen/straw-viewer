@@ -27,7 +27,6 @@ sub _make_playlists_url {
 
     $self->_make_feed_url(
                           'playlists',
-                          pageToken => $self->page_token,
                           %opts,
                          );
 }
@@ -64,13 +63,7 @@ Get and return playlists from a channel ID.
 
 sub playlists {
     my ($self, $channel_id) = @_;
-    $self->_get_results(
-        $self->_make_playlists_url(
-              ($channel_id and $channel_id ne 'mine')
-            ? (channelId => $channel_id)
-            : do { $self->get_access_token() // return; (mine => 'true') }
-        )
-    );
+    $self->_get_results($self->_make_feed_url("channels/playlists/$channel_id"));
 }
 
 =head2 playlists_from_username($username)
@@ -81,8 +74,7 @@ Get and return the playlists created for a given username.
 
 sub playlists_from_username {
     my ($self, $username) = @_;
-    my $channel_id = $self->channel_id_from_username($username) // $username;
-    $self->playlists($channel_id);
+    $self->playlists($username);
 }
 
 =head2 my_playlists()

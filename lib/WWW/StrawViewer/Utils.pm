@@ -224,8 +224,10 @@ sub has_entries {
 
     if (ref($result->{results}) eq 'HASH') {
 
-        if (exists $result->{results}{comments}) {
-            return scalar @{$result->{results}{comments}} > 0;
+        foreach my $type(qw(comments videos playlists)) {
+            if (exists $result->{results}{$type}) {
+                return scalar @{$result->{results}{$type}} > 0;
+            }
         }
 
         my $type = $result->{results}{type}//'';

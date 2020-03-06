@@ -1001,42 +1001,38 @@ sub post_as_json {
 sub next_page_with_token {
     my ($self, $url, $token) = @_;
 
-    my $pt_url = (
-                    $url =~ s{[?&]continuation=\K([^&]+)}{$token}
-                  ? $url
-                  : $self->_append_url_args($url, continuation => $token)
-                 );
+    if (not $url =~ s{[?&]continuation=\K([^&]+)}{$token}) {
+        $url = $self->_append_url_args($url, continuation => $token);
+    }
 
-    my $res = $self->_get_results($pt_url);
-    $res->{url} = $pt_url;
+    my $res = $self->_get_results($url);
+    $res->{url} = $url;
     return $res;
 }
 
 sub next_page {
-    my ($self, $url) = @_;
+    my ($self, $url, $token) = @_;
 
-    my $pt_url = (
-                    $url =~ s{[?&]page=\K(\d+)}{$1+1}e
-                  ? $url
-                  : $self->_append_url_args($url, page => 2)
-                 );
+    if ($token) {
+        return $self->next_page_with_token($url, $token);
+    }
 
-    my $res = $self->_get_results($pt_url);
-    $res->{url} = $pt_url;
+    if (not $url =~ s{[?&]page=\K(\d+)}{$1+1}e) {
+        $url = $self->_append_url_args($url, page => 2);
+    }
+
+    my $res = $self->_get_results($url);
+    $res->{url} = $url;
     return $res;
 }
 
 sub previous_page {
     my ($self, $url) = @_;
 
-    my $pt_url = (
-                    $url =~ s{[?&]page=\K(\d+)}{($1 > 2) ? ($1-1) : 1}e
-                  ? $url
-                  : $url
-                 );
+    $url =~ s{[?&]page=\K(\d+)}{($1 > 2) ? ($1-1) : 1}e;
 
-    my $res = $self->_get_results($pt_url);
-    $res->{url} = $pt_url;
+    my $res = $self->_get_results($url);
+    $res->{url} = $url;
     return $res;
 }
 

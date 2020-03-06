@@ -2403,16 +2403,14 @@ sub make_row_description {
 }
 
 sub append_next_page {
-    my ($url) = @_;
-
-    #$token // return;    # no next page is available
-
+    my ($url, $continuation) = @_;
     my $iter = $liststore->append;
 
     $liststore->set(
                     $iter,
                     0 => "<big><b>LOAD MORE</b></big>",
                     3 => $url,
+                    5 => $continuation,
                     7 => 'next_page',
                    );
 }
@@ -2662,7 +2660,14 @@ sub display_results {
         }
     }
 
-    append_next_page($url); #, #$info->{nextPageToken});
+    if (ref($results->{results}) eq 'HASH' and exists($results->{results}{continuation})) {
+        if (defined $results->{results}{continuation}) {
+             append_next_page($url, $results->{results}{continuation});
+        }
+    }
+    else {
+        append_next_page($url);
+    }
 }
 
 sub set_entry_tooltip {

@@ -2263,7 +2263,14 @@ sub general_options {
     my $callback = $args{sub};
     my $results  = $args{res};
     my $info     = $args{info};
-    my $token   = $args{token};
+
+    my $token = undef;
+    my $has_token = 0;
+
+    if (ref($info->{results}) eq 'HASH' and exists $info->{results}{continuation}) {
+        $has_token = 1;
+        $token = $info->{results}{continuation};
+    }
 
     if (not defined($option)) {
         return;
@@ -2273,9 +2280,9 @@ sub general_options {
         main_quit(0);
     }
     elsif ($option =~ /^(?:n|next)\z/ and defined $url) {
-        if (exists $args{token}) {
+        if ($has_token) {
             if (defined $token) {
-                my $request = $yv_obj->next_page_with_token($url, $token);
+                my $request = $yv_obj->next_page($url, $token);
                 $callback->($request);
             }
             else {
@@ -2633,7 +2640,6 @@ sub print_comments {
 
     my $url      = $results->{url};
     my $comments = $results->{results}{comments} // [];
-    my $token = $results->{results}{continuation};
 
     my $i = 0;
     foreach my $comment (@{$comments}) {
@@ -2692,7 +2698,6 @@ sub print_comments {
                                 info => $results,
                                 mode => 'comments',
                                 args => [$videoID],
-                                token => $token,
                                )
               ) {
                 ## ok

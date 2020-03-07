@@ -56,9 +56,9 @@ use warnings;
 no warnings 'once';
 
 my $DEVEL;    # true in devel mode
-use if ($DEVEL = 1), lib => qw(../lib);    # devel mode
+use if ($DEVEL = 0), lib => qw(../lib);    # devel mode
 
-use WWW::StrawViewer v0.0.1;
+use WWW::StrawViewer v0.0.2;
 use WWW::StrawViewer::RegularExpressions;
 
 use File::Spec::Functions qw(

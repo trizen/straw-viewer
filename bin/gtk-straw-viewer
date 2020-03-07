@@ -29,7 +29,7 @@ use warnings;
 no warnings 'once';
 
 my $DEVEL;    # true in devel mode
-use if ($DEVEL = 0), lib => qw(../lib);    # devel only
+use if ($DEVEL = 1), lib => qw(../lib);    # devel only
 
 use WWW::StrawViewer v0.0.2;
 use WWW::StrawViewer::RegularExpressions;
@@ -1386,7 +1386,7 @@ set_text(
     CTRL+H : help window
     CTRL+L : login window
     CTRL+P : preferences window
-    CTRL+Y : start CLI youtube viewer
+    CTRL+Y : start CLI Straw Viewer
     CTRL+E : enqueue the selected video
 
     CTRL+U : show the saved user-list

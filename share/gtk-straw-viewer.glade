@@ -295,7 +295,7 @@ Author: Trizen https://github.com/trizen
                         <property name="tooltip_text" translatable="yes">Search and play videos in command line interface (CTRL+Y)</property>
                         <property name="image">terminal_icon2</property>
                         <property name="use_stock">False</property>
-                        <signal name="activate" handler="run_cli_youtube_viewer" swapped="no"/>
+                        <signal name="activate" handler="run_cli_straw_viewer" swapped="no"/>
                       </object>
                     </child>
                     <child>

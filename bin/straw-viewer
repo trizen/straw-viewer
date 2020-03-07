@@ -56,7 +56,7 @@ use warnings;
 no warnings 'once';
 
 my $DEVEL;    # true in devel mode
-use if ($DEVEL = 0), lib => qw(../lib);    # devel mode
+use if ($DEVEL = 1), lib => qw(../lib);    # devel mode
 
 use WWW::StrawViewer v0.0.2;
 use WWW::StrawViewer::RegularExpressions;
@@ -446,7 +446,7 @@ sub load_config {
             $cache_dir = catdir(curdir(), '.cache');
         }
 
-        $CONFIG{cache_dir} = catdir($cache_dir, 'youtube-viewer');
+        $CONFIG{cache_dir} = catdir($cache_dir, 'straw-viewer');
         $update_config = 1;
     }
 
@@ -624,7 +624,7 @@ my $yv_utils = WWW::StrawViewer::Utils->new(youtube_url_format => $opt{youtube_v
     apply_configuration(\%temp);
 }
 
-#---------------------- YOUTUBE-VIEWER USAGE ----------------------#
+#---------------------- STRAW-VIEWER USAGE ----------------------#
 sub help {
     my $eqs = q{=} x 30;
 

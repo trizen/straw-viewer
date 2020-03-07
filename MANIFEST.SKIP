@@ -75,5 +75,5 @@ bin/yv.json
 ^MANIFEST\.SKIP
 
 # Avoid archives of this distribution
-\bWWW-YoutubeViewer-[\d\.\_]+
-WWW-YoutubeViewer-*
+\bWWW-StrawViewer-[\d\.\_]+
+WWW-StrawViewer-*

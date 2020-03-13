@@ -468,11 +468,12 @@ sub get_description {
         }
     }segi;
 
-    $desc =~ s/<br>/\n/gi;
+    $desc =~ s{<br/?>}{\n}gi;
     $desc =~ s{<a href=".*?".*?>(.*?)</a>}{$1}sgi;
     $desc =~ s/<.*?>//gs;
 
     $desc = HTML::Entities::decode_entities($desc);
+    $desc =~ s/^\s+//;
 
     ($desc =~ /\S/) ? $desc : 'No description available...';
 }

@@ -793,7 +793,7 @@ usage: $execname [options] ([url] | [keywords])
        --use-colors!    : enable or disable the ANSI colors for text
 
  * Other
-   --invidious!         : use the API of invidio.us to get the streaming URLs
+   --api-host=s         : set an API host from https://instances.invidio.us/
    --proxy=s            : set HTTP(S)/SOCKS proxy: 'proto://domain.tld:port/'
                           If authentication required,
                           use 'proto://user:pass\@domain.tld:port/'
@@ -1590,7 +1590,8 @@ sub parse_arguments {
         'merge-into-mkv|mkv-merge!'           => \$opt{merge_into_mkv},
         'merge-with-captions|merge-captions!' => \$opt{merge_with_captions},
 
-        'invidious!'                         => \$opt{use_invidious_api},
+        'api-host=s' => \$opt{api_host},
+
         'convert-command|convert-cmd=s'      => \$opt{convert_cmd},
         'dash-m4a|dash-mp4-audio|dash-mp4a!' => \$opt{dash_mp4_audio},
         'dash-segmented!'                    => \$opt{dash_segmented},
@@ -2124,7 +2125,7 @@ sub get_and_print_video_info {
 
         if ($yv_utils->has_entries($info)) {
             local $opt{show_video_info} = 1;
-            print_video_info($info->{results}{items}[0]);
+            print_video_info($info->{results});
         }
         else {
             warn_cant_do('get info for', $videoID);
@@ -2276,7 +2277,7 @@ sub general_options {
         $callback->($request);
     }
     elsif ($option =~ /^(?:R|refresh)\z/ and defined $url) {
-        @{$results} = @{$yv_obj->_get_results($url)->{results}{items}};
+        @{$results} = @{$yv_obj->_get_results($url)->{results}};
     }
     elsif ($option eq 'login') {
         authenticate();
@@ -3371,7 +3372,7 @@ sub autoplay {
     while (1) {
         get_and_play_video_ids($video_id) || return;
         my $related = $yv_obj->related_to_videoID($video_id);
-        (my @video_ids = grep { !$seen{$_}++ } map { $yv_utils->get_video_id($_) } @{$related->{results}{items}}) || return;
+        (my @video_ids = grep { !$seen{$_}++ } map { $yv_utils->get_video_id($_) } @{$related->{results}}) || return;
         $video_id = $opt{shuffle} ? $video_ids[rand @video_ids] : $video_ids[0];
     }
 
@@ -3875,7 +3876,7 @@ sub print_videos {
                 #}
             }
             elsif ($opt =~ /^(?:R|refresh)\z/) {
-                @{$videos} = @{$yv_obj->_get_results($url)->{results}{items}};
+                @{$videos} = @{$yv_obj->_get_results($url)->{results}};
                 $results->{has_extra_info} = 0;
             }
             elsif ($opt =~ /^(?:r|return)\z/) {

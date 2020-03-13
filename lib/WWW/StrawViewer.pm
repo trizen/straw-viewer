@@ -92,8 +92,8 @@ my %valid_options = (
     access_token  => {valid => [qr/^.{15}/], default => undef},
     refresh_token => {valid => [qr/^.{15}/], default => undef},
 
-    authentication_file => {valid => [qr/^./],         default => undef},
-    api_host            => {valid => [qr{^https?://}], default => "https://invidio.us"},
+    authentication_file => {valid => [qr/^./],             default => undef},
+    api_host            => {valid => [qr{[-\w]+\.[-\w]+}], default => "https://invidio.us"},
 
     # No input value allowed
     api_path         => {valid => q[], default => '/api/v1/'},
@@ -135,6 +135,7 @@ sub basic_video_info_fields {
           title
           videoId
           description
+          descriptionHtml
           published
           publishedText
           viewCount
@@ -493,7 +494,16 @@ sub _append_url_args {
 
 sub get_api_url {
     my ($self) = @_;
-    join('', $self->get_api_host, $self->get_api_path);
+
+    my $host = $self->get_api_host;
+
+    $host =~ s{/+\z}{};    # remove trailing '/'
+
+    if ($host =~ m{^[-\w]+(?>\.[-\w]+)+\z}) {    # no protocol specified
+        $host = 'https://' . $host;              # default to HTTPS
+    }
+
+    join('', $host, $self->get_api_path);
 }
 
 sub _simple_feeds_url {

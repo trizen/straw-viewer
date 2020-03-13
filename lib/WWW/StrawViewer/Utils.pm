@@ -452,8 +452,29 @@ Get description.
 
 sub get_description {
     my ($self, $info) = @_;
-    my $desc = $info->{description};
-    (defined($desc) and $desc =~ /\S/) ? $desc : 'No description available...';
+
+    my $desc = $info->{descriptionHtml} // '';
+
+    require URI::Escape;
+    require HTML::Entities;
+
+    $desc =~ s{<a href="/redirect\?(.*?)".*?>.*?</a>}{
+        my $url = $1;
+        if ($url =~ /(?:^|;)q=([^&]+)/) {
+            URI::Escape::uri_unescape($1);
+        }
+        else {
+            $url;
+        }
+    }segi;
+
+    $desc =~ s/<br>/\n/gi;
+    $desc =~ s{<a href=".*?".*?>(.*?)</a>}{$1}sgi;
+    $desc =~ s/<.*?>//gs;
+
+    $desc = HTML::Entities::decode_entities($desc);
+
+    ($desc =~ /\S/) ? $desc : 'No description available...';
 }
 
 =head2 get_title($info)

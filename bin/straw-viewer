@@ -1940,7 +1940,7 @@ sub get_user_input {
 
     if ($opt{history}) {
         my $str = join(' ', grep { /\w/ } @{$args}, @{$keywords});
-        if ($str ne '' and $str !~ /^[0-9]{1,2}\z/) {
+        if ($str ne '' and $str !~ /^[0-9]{1,3}\z/) {
             $term->append_history(1, $opt{history_file});
         }
     }
@@ -2422,7 +2422,7 @@ sub get_reply {
 
 sub valid_num {
     my ($num, $array_ref) = @_;
-    return $num =~ /^[0-9]{1,2}\z/ && $num != 0 && $num <= @{$array_ref};
+    return $num =~ /^[0-9]{1,3}\z/ && $num != 0 && $num <= @{$array_ref};
 }
 
 sub adjust_width {
@@ -3002,7 +3002,7 @@ sub get_valid_numbers {
     foreach my $id (split(/[,\s]+/, $input)) {
         push @output,
             $id =~ /$range_num_re/ ? get_range_numbers($1, $2)
-          : $id =~ /^[0-9]{1,2}\z/ ? $id
+          : $id =~ /^[0-9]{1,3}\z/ ? $id
           :                          next;
     }
 

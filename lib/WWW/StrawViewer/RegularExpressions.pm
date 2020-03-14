@@ -21,9 +21,9 @@ WWW::StrawViewer::RegularExpressions - Various utils.
 my $opt_begin_chars = q{:;=};    # stdin option valid begin chars
 
 # Options
-our $range_num_re        = qr{^([0-9]{1,2}+)(?>-|\.\.)([0-9]{1,2}+)?\z};
+our $range_num_re        = qr{^([0-9]{1,3}+)(?>-|\.\.)([0-9]{1,3}+)?\z};
 our $digit_or_equal_re   = qr/(?(?=[1-9])|=)/;
-our $non_digit_or_opt_re = qr{^(?!$range_num_re)(?>[0-9]{1,2}[^0-9]|[0-9]{3}|[^0-9$opt_begin_chars])};
+our $non_digit_or_opt_re = qr{^(?!$range_num_re)(?>[0-9]{1,3}[^0-9]|[0-9]{4}|[^0-9$opt_begin_chars])};
 
 # Generic name
 my $generic_name_re = qr/[a-zA-Z0-9_.\-]{11,34}/;

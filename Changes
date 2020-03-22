@@ -6,6 +6,11 @@
 
 [CHANGELOG]
 
+Version 0.0.3
+
+- More bug fixes.
+- Extract URLs in description from `descriptionHtml`.
+
 Version 0.0.2
 
 - Several bug fixes.

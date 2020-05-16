@@ -215,8 +215,7 @@ my %CONFIG = (
     srt_languages => ['en', 'es'],
     get_captions  => 1,
     auto_captions => 0,
-    captions_dir  => catdir(tmpdir(), 'straw-viewer'),
-    cache_dir     => catdir(tmpdir(), 'straw-viewer'),
+    cache_dir     => undef,
 
     # Others
     env_proxy   => 1,
@@ -459,7 +458,7 @@ if (not defined $CONFIG{cache_dir}) {
     $CONFIG{cache_dir} = catdir($cache_dir, 'straw-viewer');
 }
 
-foreach my $path($CONFIG{cache_dir}, $CONFIG{captions_dir}) {
+foreach my $path($CONFIG{cache_dir}) {
     next if -d $path;
     require File::Path;
     File::Path::make_path($path)
@@ -3005,7 +3004,7 @@ sub get_streaming_url {
         require WWW::StrawViewer::GetCaption;
         my $yv_cap = WWW::StrawViewer::GetCaption->new(
                                                          auto_captions => $CONFIG{auto_captions},
-                                                         captions_dir  => $CONFIG{captions_dir},
+                                                         captions_dir  => $CONFIG{cache_dir},
                                                          captions      => $captions,
                                                          languages     => $CONFIG{srt_languages},
                                                         );

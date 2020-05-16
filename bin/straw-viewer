@@ -206,8 +206,7 @@ my %CONFIG = (
     get_captions  => 1,
     auto_captions => 0,
     copy_caption  => 0,
-    captions_dir  => catdir(tmpdir(), 'straw-viewer'),
-    cache_dir     => catdir(tmpdir(), 'straw-viewer'),
+    cache_dir     => undef,
 
     # API
     api_host => "https://invidio.us",
@@ -544,7 +543,7 @@ sub load_config {
 
     dump_configuration($config_file) if $update_config;
 
-foreach my $path($CONFIG{cache_dir}, $CONFIG{captions_dir}) {
+foreach my $path($CONFIG{cache_dir}) {
     next if -d $path;
     require File::Path;
     File::Path::make_path($path)
@@ -770,7 +769,6 @@ usage: $execname [options] ([url] | [keywords])
  * Closed-captions
    --get-captions!      : download closed-captions for videos
    --auto-captions!     : include or exclude auto-generated captions
-   --captions-dir=s     : directory where to save the .srt files
 
  * Config
    --config=s           : configuration file
@@ -1621,7 +1619,6 @@ sub parse_arguments {
         'get-captions|get_captions!'     => \$opt{get_captions},
         'auto-captions|auto_captions!'   => \$opt{auto_captions},
         'copy-caption|copy_caption!'     => \$opt{copy_caption},
-        'captions-dir|captions_dir=s'    => \$opt{captions_dir},
         'skip-if-exists|skip_if_exists!' => \$opt{skip_if_exists},
         'downloads-dir|download-dir=s'   => \$opt{downloads_dir},
         'fat32safe!'                     => \$opt{fat32safe},
@@ -3024,7 +3021,7 @@ sub get_streaming_url {
         require WWW::StrawViewer::GetCaption;
         my $yv_cap = WWW::StrawViewer::GetCaption->new(
                                                          auto_captions => $opt{auto_captions},
-                                                         captions_dir  => $opt{captions_dir},
+                                                         captions_dir  => $opt{cache_dir},
                                                          captions      => $captions,
                                                          languages     => $CONFIG{srt_languages},
                                                         );
@@ -3285,7 +3282,7 @@ sub download_video {
         }
     }
 
-    # Copy the .srt file from captions-dir to downloads-dir
+    # Copy the .srt file to downloads-dir
     if (    $opt{copy_caption}
         and -e $video_filename
         and defined($streaming->{srt_file})

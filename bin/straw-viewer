@@ -2951,10 +2951,14 @@ FORMAT
             ## ok
         }
         elsif (valid_num($key, $playlists) and not $contains_keywords) {
+
+            my $id = $yv_utils->get_playlist_id($playlists->[$key - 1]);
+
             if ($args{return_playlist_id}) {
-                return $yv_utils->get_playlist_id($playlists->[$key - 1]);
+                return $id;
             }
-            get_and_print_videos_from_playlist($yv_utils->get_playlist_id($playlists->[$key - 1]));
+
+            get_and_print_videos_from_playlist($id);
         }
         else {
             push @for_search, $key;

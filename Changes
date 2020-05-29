@@ -1,10 +1,15 @@
 # Revision history for straw-viewer.
-# Only the most important changes and features are included here.
 
 # For all changes, check out the release notes at:
 #   https://github.com/trizen/straw-viewer/releases
 
 [CHANGELOG]
+
+Version 0.0.4
+
+- Detect videos with `signatureCipher` and fallback to `youtube-dl`.
+- Allow channel & playlist IDs to be longer (between 11 and 64 characters).
+- Changed the default cache direction from `/tmp/straw-viewer` to `~/.cache/straw-viewer`.
 
 Version 0.0.3
 

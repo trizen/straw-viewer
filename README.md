@@ -1,6 +1,6 @@
 ## straw-viewer
 
-A lightweight application for searching and streaming videos from YouTube, using the API of [invidio.us](https://invidio.us/).
+A lightweight application for searching and streaming videos from YouTube, using the [API](https://github.com/omarroth/invidious/wiki/API) of [invidio.us](https://invidio.us/).
 
 ### straw-viewer
 

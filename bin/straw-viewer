@@ -4017,7 +4017,8 @@ sub print_videos {
             }
             elsif ($opt =~ /^(?:ap|autoplay)${digit_or_equal_re}(.*)/) {
                 if (my ($id) = get_valid_numbers($#{$videos}, $1)) {
-                    autoplay($yv_utils->get_video_id($videos->[$id]));
+                    local $opt{autoplay_mode} = 1;
+                    play_videos([$videos->[$id]]);
                 }
                 else {
                     warn_no_thing_selected('video');

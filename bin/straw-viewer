@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  straw-viewer
 #  Fork: 14 February 2020
-#  Edit: 29 May 2020
+#  Edit: 05 June 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -2075,15 +2075,21 @@ sub rate_videos {
 
 sub get_and_play_video_ids {
     (my @ids = grep { get_valid_video_id($_) } @_) || return;
-    my $info = $yv_obj->video_details(join(',', @ids));
 
-    if ($yv_utils->has_entries($info)) {
-        if (not play_videos([$info->{results}])) {
-            return;
+    foreach my $id (@ids) {
+        my $info = $yv_obj->video_details($id);
+
+        if (ref($info) eq 'HASH' and keys %$info) {
+            ## OK
         }
-    }
-    else {
-        warn_cant_do('get info for', @ids);
+        else {
+            $info->{title} = "unknwon";
+            $info->{lengthSeconds} = 0;
+            $info->{videoId} = $id;
+            warn_cant_do('get info for', $id);
+        }
+
+        play_videos([$info]) || return;
     }
 
     return 1;
@@ -2104,9 +2110,9 @@ sub get_and_print_video_info {
         my $videoID = get_valid_video_id($id) // next;
         my $info    = $yv_obj->video_details($videoID);
 
-        if ($yv_utils->has_entries($info)) {
+        if (ref($info) eq 'HASH' and keys %$info) {
             local $opt{show_video_info} = 1;
-            print_video_info($info->{results});
+            print_video_info($info);
         }
         else {
             warn_cant_do('get info for', $videoID);

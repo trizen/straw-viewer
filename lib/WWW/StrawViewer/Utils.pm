@@ -230,7 +230,7 @@ sub has_entries {
             }
         }
 
-        my $type = $result->{results}{type}//'';
+        my $type = $result->{results}{type} // '';
 
         if ($type eq 'playlist') {
             return $result->{results}{videoCount} > 0;
@@ -239,6 +239,10 @@ sub has_entries {
 
     if (ref($result->{results}) eq 'ARRAY') {
         return scalar(@{$result->{results}}) > 0;
+    }
+
+    if (ref($result->{results}) eq 'HASH' and not keys %{$result->{results}}) {
+        return 0;
     }
 
     return 1;      # maybe?
@@ -458,6 +462,7 @@ sub get_description {
     require URI::Escape;
     require HTML::Entities;
 
+    # Decode external links
     $desc =~ s{<a href="/redirect\?(.*?)".*?>.*?</a>}{
         my $url = $1;
         if ($url =~ /(?:^|;)q=([^&]+)/) {
@@ -466,6 +471,13 @@ sub get_description {
         else {
             $url;
         }
+    }segi;
+
+    # Decode internal links to videos / playlists
+    $desc =~ s{<a href="/(watch\?.*?)".*?>(https://www\.youtube\.com)/watch\?.*?</a>}{
+        my $url = $2;
+        my $params = URI::Escape::uri_unescape($1);
+        "$url/$params";
     }segi;
 
     $desc =~ s{<br/?>}{\n}gi;

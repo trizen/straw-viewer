@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 29 May 2020
+#  Edit: 05 June 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -2225,11 +2225,8 @@ sub check_keywords {
 
     if ($key =~ /$get_video_id_re/o) {
         my $info = $yv_obj->video_details($+{video_id});
-
-        if ($yv_utils->has_entries($info)) {
-            if (not play_video($info->{results})) {
-                return;
-            }
+        if (ref($info) eq 'HASH' and keys %$info) {
+            play_video($info) || return;
         }
         else {
             return;

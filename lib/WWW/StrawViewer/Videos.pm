@@ -187,8 +187,56 @@ When C<$part> is C<undef>, it defaults to I<snippet>.
 
 sub video_details {
     my ($self, $id, $fields) = @_;
+
     $fields //= $self->basic_video_info_fields;
-    $self->_get_results($self->_make_feed_url("videos/$id", fields => $fields));
+    my $info = $self->_get_results($self->_make_feed_url("videos/$id", fields => $fields))->{results};
+
+    if (ref($info) eq 'HASH' and exists $info->{videoId} and exists $info->{title}) {
+        return $info;
+    }
+
+    if ($self->get_debug) {
+        say STDERR ":: Extracting video info using the fallback method...";
+    }
+
+    # Fallback using the `get_video_info` URL
+    my %video_info = $self->_get_video_info($id);
+    my $video      = $self->parse_json_string($video_info{player_response} // return);
+
+    if (exists $video->{videoDetails}) {
+        $video = $video->{videoDetails};
+    }
+    else {
+        return;
+    }
+
+    my %details = (
+        title   => $video->{title},
+        videoId => $video->{videoId},
+
+        videoThumbnails => [
+            map {
+                scalar {
+                        quality => 'medium',
+                        url     => $_->{url},
+                        width   => $_->{width},
+                        height  => $_->{height},
+                       }
+            } @{$video->{thumbnail}{thumbnails}}
+        ],
+
+        description   => $video->{shortDescription},
+        lengthSeconds => $video->{lengthSeconds},
+
+        keywords  => $video->{keywords},
+        viewCount => $video->{viewCount},
+
+        author   => $video->{author},
+        authorId => $video->{channelId},
+        rating   => $video->{averageRating},
+                  );
+
+    return \%details;
 }
 
 =head2 Return details

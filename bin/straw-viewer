@@ -3776,7 +3776,9 @@ sub print_videos {
               ) {
                 if ($opt{play_backwards}) {
                     #if (defined $info->{prevPageToken}) {
-                        __SUB__->($yv_obj->previous_page($url), auto => 1);
+                        if (defined($url)) {
+                            __SUB__->($yv_obj->previous_page($url), auto => 1);
+                        }
                     #}
                     #else {
                     #    $opt{play_backwards} = 0;
@@ -3786,7 +3788,9 @@ sub print_videos {
                 }
                 else {
                     #if (defined $info->{nextPageToken}) {
+                    if (defined($url)) {
                         __SUB__->($yv_obj->next_page($url), auto => 1);
+                    }
                     #}
                     #else {
                     #    $opt{play_all} = 0;
@@ -3841,8 +3845,10 @@ sub print_videos {
             }
             elsif ($opt =~ /^(?:n|next)\z/) {
                 #if (defined $info->{nextPageToken}) {
+                if (defined($url)) {
                     my $request = $yv_obj->next_page($url);
                     __SUB__->($request, @keywords ? (auto => 1) : ());
+                }
                 #}
                 #else {
                 #    warn_last_page();
@@ -3855,7 +3861,9 @@ sub print_videos {
             }
             elsif ($opt =~ /^(?:b|back|p|prev|previous)\z/) {
                 #if (defined $info->{prevPageToken}) {
+                if (defined($url)) {
                     __SUB__->($yv_obj->previous_page($url), @keywords ? (auto => 1) : ());
+                }
                 #}
                 #else {
                 #    warn_first_page();

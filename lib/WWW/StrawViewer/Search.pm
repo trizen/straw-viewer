@@ -144,8 +144,98 @@ be set to a YouTube video ID.
 =cut
 
 sub related_to_videoID {
-    my ($self, $id) = @_;
-    return $self->search_for('video', [], {relatedToVideoId => $id});
+    my ($self, $videoID) = @_;
+
+    my %info           = $self->_get_video_info($videoID);
+    my $watch_next_response = $self->parse_json_string($info{watch_next_response});
+    my $related = eval { $watch_next_response->{contents}{twoColumnWatchNextResults}{secondaryResults}{secondaryResults}{results} } // return { results => []};
+
+    my @results;
+
+    foreach my $entry(@$related) {
+
+        my $info = $entry->{compactVideoRenderer} // next;
+        my $title = $info->{title}{simpleText} // next;
+
+        my $viewCount = 0;
+
+        if ($info->{viewCountText}{simpleText} =~ /^([\d,]+) views/) {
+            $viewCount = ($1 =~ tr/,//dr);
+        }
+
+        my $lengthSeconds = 0;
+
+        if ($info->{lengthText}{simpleText} =~ /([\d:]+)/) {
+            my $time = $1;
+            my @fields = split(/:/, $time);
+
+            my $seconds = pop(@fields) // 0;
+            my $minutes = pop(@fields) // 0;
+            my $hours = pop(@fields) // 0;
+
+            $lengthSeconds = 3600 * $hours + 60*$minutes + $seconds;
+        }
+
+        my $published = 0;
+        if (exists $info->{publishedTimeText} and $info->{publishedTimeText}{simpleText} =~ /(\d+)\s+(\w+)\s+ago/) {
+
+            my $quantity = $1;
+            my $period = $2;
+
+            $period =~ s/s\z//; # make it singural
+
+            my %table = (
+                year => 31556952,       # seconds in a year
+                month => 2629743.83,    # seconds in a month
+                week => 604800,         # seconds in a week
+                day => 86400,           # seconds in a day
+                minute => 60,           # seconds in a minute
+                second => 1,            # seconds in a second
+            );
+
+            if (exists $table{$period}) {
+                $published = int(time - $quantity * $table{$period});
+            }
+            else {
+                warn "BUG: cannot parse: <<$quantity $period>>";
+            }
+        }
+
+        push @results, {
+            type => "video",
+            title => $title,
+            videoId => $info->{videoId},
+            author => $info->{longBylineText}{runs}[0]{text},
+            authorId => $info->{longBylineText}{runs}[0]{navigationEndpoint}{browseEndpoint}{browseId},
+            #authorUrl => $info->{longBylineText}{runs}[0]{navigationEndpoint}{browseEndpoint}{browseId},
+
+            description => $info->{accessibility}{accessibilityData}{label},
+            descriptionHtml => undef,
+            viewCount => $viewCount,
+            published => $published,
+            publishedText => $info->{publishedTimeText}{simpleText},
+            lengthSeconds => $lengthSeconds,
+            liveNow => ($lengthSeconds == 0), # maybe it's live if lengthSeconds == 0?
+            paid => 0,
+            premium => 0,
+
+            videoThumbnails => [
+                map {
+                    scalar {
+                        quality => 'medium',
+                        url => $_->{url},
+                        width => $_->{width},
+                        height => $_->{height},
+                    }
+                } @{$info->{thumbnail}{thumbnails}}
+            ],
+        };
+    }
+
+    return scalar {
+        url => undef,
+        results => \@results,
+    };
 }
 
 =head1 AUTHOR

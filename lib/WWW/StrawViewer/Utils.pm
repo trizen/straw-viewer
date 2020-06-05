@@ -453,7 +453,7 @@ Get description.
 sub get_description {
     my ($self, $info) = @_;
 
-    my $desc = $info->{descriptionHtml} // '';
+    my $desc = $info->{descriptionHtml} // $info->{description} // '';
 
     require URI::Escape;
     require HTML::Entities;

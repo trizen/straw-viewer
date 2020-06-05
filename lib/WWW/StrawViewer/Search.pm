@@ -150,6 +150,9 @@ sub related_to_videoID {
     my $watch_next_response = $self->parse_json_string($info{watch_next_response});
     my $related = eval { $watch_next_response->{contents}{twoColumnWatchNextResults}{secondaryResults}{secondaryResults}{results} } // return { results => []};
 
+    #use Data::Dump qw(pp);
+    #pp $related;
+
     my @results;
 
     foreach my $entry(@$related) {
@@ -161,6 +164,9 @@ sub related_to_videoID {
 
         if ($info->{viewCountText}{simpleText} =~ /^([\d,]+) views/) {
             $viewCount = ($1 =~ tr/,//dr);
+        }
+        elsif ($info->{viewCountText}{simpleText} =~ /Recommended for you/i) {
+            next;       # filter out recommended videos from related videos
         }
 
         my $lengthSeconds = 0;
@@ -189,6 +195,7 @@ sub related_to_videoID {
                 month => 2629743.83,    # seconds in a month
                 week => 604800,         # seconds in a week
                 day => 86400,           # seconds in a day
+                hour => 3600,           # seconds in a hour
                 minute => 60,           # seconds in a minute
                 second => 1,            # seconds in a second
             );

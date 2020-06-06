@@ -22,6 +22,9 @@ The project is in its early stages of development and some features are not impl
 
 * Arch Linux (AUR): https://aur.archlinux.org/packages/straw-viewer-git/
 
+* Slackware: https://slackbuilds.org/repository/14.2/multimedia/straw-viewer/
+
+
 ### INSTALLATION
 
 To install `straw-viewer`, run:
@@ -39,6 +42,21 @@ To install `gtk-straw-viewer` along with `straw-viewer`, run:
     sudo ./Build installdeps
     sudo ./Build install
 ```
+
+
+### TRY
+
+For trying the latest commit of `straw-viewer`, without installing it, execute the following commands:
+
+```console
+cd /tmp
+wget https://github.com/trizen/straw-viewer/archive/master.zip -O straw-viewer-master.zip
+unzip -n straw-viewer-master.zip
+cd straw-viewer-master/bin
+perl -pi -ne 's{DEVEL = 0}{DEVEL = 1}' {gtk-,}straw-viewer
+./straw-viewer
+```
+
 
 ### DEPENDENCIES
 

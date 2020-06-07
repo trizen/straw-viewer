@@ -2385,6 +2385,8 @@ sub make_row_description {
 
 sub append_next_page {
     my ($url, $continuation) = @_;
+
+    $url // return;
     my $iter = $liststore->append;
 
     $liststore->set(

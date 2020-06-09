@@ -1,6 +1,6 @@
 ## straw-viewer
 
-A lightweight application for searching and streaming videos from YouTube, using the [API](https://github.com/omarroth/invidious/wiki/API) of [invidio.us](https://invidio.us/).
+A lightweight application for searching and playing videos from YouTube, using the [API](https://github.com/omarroth/invidious/wiki/API) of [invidio.us](https://invidio.us/).
 
 ### straw-viewer
 
@@ -49,12 +49,12 @@ To install `gtk-straw-viewer` along with `straw-viewer`, run:
 For trying the latest commit of `straw-viewer`, without installing it, execute the following commands:
 
 ```console
-cd /tmp
-wget https://github.com/trizen/straw-viewer/archive/master.zip -O straw-viewer-master.zip
-unzip -n straw-viewer-master.zip
-cd straw-viewer-master/bin
-perl -pi -ne 's{DEVEL = 0}{DEVEL = 1}' {gtk-,}straw-viewer
-./straw-viewer
+    cd /tmp
+    wget https://github.com/trizen/straw-viewer/archive/master.zip -O straw-viewer-master.zip
+    unzip -n straw-viewer-master.zip
+    cd straw-viewer-master/bin
+    perl -pi -ne 's{DEVEL = 0}{DEVEL = 1}' {gtk-,}straw-viewer
+    ./straw-viewer
 ```
 
 

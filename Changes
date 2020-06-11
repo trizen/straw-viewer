@@ -5,6 +5,12 @@
 
 [CHANGELOG]
 
+Version 0.0.5
+
+- Added basic support for related videos (--related=videoID).
+- Added a fallback method for video info when invidio.us fails.
+- The GTK+ interface should now work with any GTK+ >= 3.00 (previously it required GTK+ >= 3.20).
+
 Version 0.0.4
 
 - Detect videos with `signatureCipher` and fallback to `youtube-dl`.

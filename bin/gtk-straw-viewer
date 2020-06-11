@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 05 June 2020
+#  Edit: 11 June 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -23,7 +23,7 @@
 #   https://github.com/trizen/youtube-viewer
 
 use utf8;
-use 5.014;
+use 5.016;
 
 use warnings;
 no warnings 'once';
@@ -31,7 +31,7 @@ no warnings 'once';
 my $DEVEL;    # true in devel mode
 use if ($DEVEL = 0), lib => qw(../lib);    # devel only
 
-use WWW::StrawViewer v0.0.4;
+use WWW::StrawViewer v0.0.5;
 use WWW::StrawViewer::RegularExpressions;
 
 use Gtk3 qw(-init);
@@ -467,7 +467,7 @@ foreach my $path($CONFIG{cache_dir}) {
 
 {
     my $split_string = sub {
-        grep { $_ ne '' } split(/\W+/, lc($_[0]));
+        grep { $_ ne '' } split(/\W+/, CORE::fc($_[0]));
     };
 
     my %history_dict;
@@ -528,7 +528,7 @@ foreach my $path($CONFIG{cache_dir}) {
         }
 
         foreach my $token (@tokens) {
-            @matches = grep { index(lc($_), $token) != -1 } @matches;
+            @matches = grep { index(CORE::fc($_), $token) != -1 } @matches;
         }
 
         my $store = Gtk3::ListStore->new(['Glib::String']);
@@ -634,7 +634,7 @@ foreach my $path($CONFIG{cache_dir}) {
             else {
                 unshift @search_history, $line;
             }
-            undef $history{lc($line)};
+            undef $history{CORE::fc($line)};
         }
 
         require List::Util;
@@ -717,7 +717,7 @@ foreach my $path($CONFIG{cache_dir}) {
 
         my $str = join(' ', split(' ', $text));
 
-        if ($is_search_keyword or not exists $history{lc($str)}) {
+        if ($is_search_keyword or not exists $history{CORE::fc($str)}) {
             if (set_history()) {
 
                 if ($is_search_keyword) {
@@ -727,7 +727,7 @@ foreach my $path($CONFIG{cache_dir}) {
                     say {$history_fh} "~" . $str;
                 }
             }
-            undef $history{$str};
+            undef $history{CORE::fc($str)};
             update_history_dict($str);
         }
     }
@@ -2635,9 +2635,9 @@ sub display_results {
             #$item->{__is_video__} = 1;
 
             # Store the video title to history (when `save_titles_to_history` is true)
-            #if ($CONFIG{save_titles_to_history}) {
-            #    append_to_history($yv_utils->get_title($item), 0);
-            #}
+            if ($CONFIG{save_titles_to_history}) {
+                append_to_history($yv_utils->get_title($item), 0);
+            }
 
             add_video_entry($item);
         }

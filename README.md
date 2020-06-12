@@ -97,8 +97,6 @@ To package this application, run the following commands:
 
 Sometimes, the default instance, [invidio.us](https://invidio.us/), may fail to work properly. When this happens, we can change the API host to some other instance of invidious, such as [invidious.snopyta.org](https://invidious.snopyta.org/).
 
-The available instances are listed at: https://instances.invidio.us/
-
 ```console
     straw-viewer --api=invidious.snopyta.org
 ```
@@ -108,6 +106,9 @@ This can be changed permanently, by setting in the configuration file:
 ```perl
     api_host => "invidious.snopyta.org",
 ```
+
+The available instances are listed at: https://instances.invidio.us/
+
 
 ### SUPPORT AND DOCUMENTATION
 

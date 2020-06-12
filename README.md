@@ -14,9 +14,11 @@ A lightweight application for searching and playing videos from YouTube, using t
 
 ![gtk-straw-viewer](https://user-images.githubusercontent.com/614513/73087694-93ffdb80-3edb-11ea-8fea-05901d72f68d.png)
 
+
 ### STATUS
 
 The project is in its early stages of development and some features are not implemented yet.
+
 
 ### AVAILABILITY
 
@@ -89,6 +91,22 @@ To package this application, run the following commands:
     perl Build.PL --destdir "/my/package/path" --installdirs vendor [--gtk]
     ./Build test
     ./Build install --install_path script=/usr/bin
+```
+
+### INVIDIOUS INSTANCES
+
+Sometimes, the default instance, [invidio.us](https://invidio.us/), may fail to work properly. When this happens, we can change the API host to some other instance of invidious, such as [invidious.snopyta.org](https://invidious.snopyta.org/).
+
+The available instances are listed at: https://instances.invidio.us/
+
+```console
+    straw-viewer --api=invidious.snopyta.org
+```
+
+This can be changed permanently, by setting in the configuration file:
+
+```perl
+    api_host => "invidious.snopyta.org",
 ```
 
 ### SUPPORT AND DOCUMENTATION

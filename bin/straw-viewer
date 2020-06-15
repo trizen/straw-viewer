@@ -1583,7 +1583,7 @@ sub parse_arguments {
         'merge-into-mkv|mkv-merge!'           => \$opt{merge_into_mkv},
         'merge-with-captions|merge-captions!' => \$opt{merge_with_captions},
 
-        'api-host=s' => \$opt{api_host},
+        'api-host|instance=s' => \$opt{api_host},
 
         'convert-command|convert-cmd=s'      => \$opt{convert_cmd},
         'dash-m4a|dash-mp4-audio|dash-mp4a!' => \$opt{dash_mp4_audio},

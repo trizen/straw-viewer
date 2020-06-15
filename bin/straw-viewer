@@ -394,7 +394,7 @@ EOD
 
         my $dumped_config = q{our $CONFIG = } . Data::Dump::pp(\%CONFIG) . "\n";
 
-        if ($home_dir eq $ENV{HOME}) {
+        if (defined($ENV{HOME}) and $home_dir eq $ENV{HOME}) {
             $dumped_config =~ s/\Q$home_dir\E/\$ENV{HOME}/g;
         }
 
@@ -510,7 +510,7 @@ sub load_config {
     # Enable history if Term::ReadLine::Gnu::XS is installed
     if (not defined $CONFIG{history}) {
 
-        if ($term->can('ReadHistory')) {
+        if (eval { $term->can('ReadHistory') }) {
             $CONFIG{history} = 1;
         }
         else {
@@ -558,12 +558,24 @@ if ($opt{history}) {
 
     # Create the history file.
     if (not -e $opt{history_file}) {
+
+        require File::Basename;
+        my $dir = File::Basename::dirname($opt{history_file});
+
+        if (not -d $dir) {
+            require File::Path;
+            File::Path::make_path($dir)
+                or warn "[!] Can't create path <<$dir>>: $!";
+        }
+
         open my $fh, '>', $opt{history_file}
           or warn "[!] Can't create the history file `$opt{history_file}': $!";
     }
 
     # Add history to Term::ReadLine
-    $term->ReadHistory($opt{history_file});
+    if (eval { $term->can('ReadHistory') }) {
+        $term->ReadHistory($opt{history_file});
+    }
 
     # All history entries
     my @history = $term->history_list;

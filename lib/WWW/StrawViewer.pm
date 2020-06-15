@@ -548,7 +548,7 @@ sub _make_feed_url {
 sub _extract_from_invidious {
     my ($self, $videoID) = @_;
 
-    my $url = sprintf("https://invidio.us/api/v1/videos/%s?fields=formatStreams,adaptiveFormats", $videoID);
+    my $url = sprintf($self->get_api_url . "videos/%s?fields=formatStreams,adaptiveFormats", $videoID);
 
     my $tries = 3;
     my $resp  = $self->{lwp}->get($url);

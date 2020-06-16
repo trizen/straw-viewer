@@ -1,6 +1,6 @@
 ## straw-viewer
 
-A lightweight application for searching and playing videos from YouTube, using the [API](https://github.com/omarroth/invidious/wiki/API) of [invidio.us](https://invidio.us/).
+A lightweight application (fork of [youtube-viewer](https://github.com/trizen/youtube-viewer)) for searching and playing videos from YouTube, using the [API](https://github.com/omarroth/invidious/wiki/API) of [invidio.us](https://invidio.us/).
 
 ### straw-viewer
 
@@ -12,7 +12,7 @@ A lightweight application for searching and playing videos from YouTube, using t
 
 * GTK+ interface to YouTube.
 
-![gtk-straw-viewer](https://user-images.githubusercontent.com/614513/73087694-93ffdb80-3edb-11ea-8fea-05901d72f68d.png)
+![gtk-straw-viewer](https://user-images.githubusercontent.com/614513/84770876-11d69780-afe1-11ea-96f7-5d426dc865e5.png)
 
 
 ### STATUS

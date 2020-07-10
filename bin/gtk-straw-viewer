@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 11 June 2020
+#  Edit: 10 July 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -189,6 +189,7 @@ my %CONFIG = (
     prefer_mp4      => 0,
     prefer_av1      => 0,
     maxResults      => 10,
+    hfr             => 1,           # true to prefer high frame rate (HFR) videos
     resolution      => 'best',
     videoDimension  => undef,
     videoEmbeddable => undef,
@@ -3013,6 +3014,7 @@ sub get_streaming_url {
       $yv_itags->find_streaming_url(
                                     urls           => $urls,
                                     resolution     => $CONFIG{resolution},
+                                    hfr            => $CONFIG{hfr},
                                     dash           => $CONFIG{dash_support},
                                     dash_mp4_audio => $CONFIG{dash_mp4_audio},
                                     dash_segmented => $CONFIG{dash_segmented},

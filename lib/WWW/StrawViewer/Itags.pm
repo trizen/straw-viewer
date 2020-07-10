@@ -172,14 +172,14 @@ sub _find_streaming_url {
 
     foreach my $itag (@{$args{itags}->{$resolution}}) {
 
+        next if not exists $stream->{$itag->{value}};
+
         if ($itag->{hfr}) {
             $args{hfr} || next;    # skip high frame rate (HFR) videos
         }
 
         if ($itag->{dash}) {
             $args{dash} || next;
-
-            next if not exists $stream->{$itag->{value}};
 
             my $video_info = $stream->{$itag->{value}};
             my $audio_info = $self->_find_streaming_url(%args, resolution => 'audio', dash => 0);
@@ -192,23 +192,20 @@ sub _find_streaming_url {
             next;
         }
 
-        if (exists $stream->{$itag->{value}}) {
-
-            if ($resolution eq 'audio' and not $args{dash_mp4_audio}) {
-                if ($itag->{format} eq 'mp4') {
-                    next;    # skip mp4 audio URLs
-                }
+        if ($resolution eq 'audio' and not $args{dash_mp4_audio}) {
+            if ($itag->{format} eq 'mp4') {
+                next;    # skip mp4 audio URLs
             }
-
-            my $entry = $stream->{$itag->{value}};
-
-            # Ignore segmented DASH URLs (they load pretty slow in mpv)
-            if (not $args{dash_segmented}) {
-                next if ($entry->{url} =~ m{^https://manifest\.googlevideo\.com/api/manifest/dash/});
-            }
-
-            return $entry;
         }
+
+        my $entry = $stream->{$itag->{value}};
+
+        # Ignore segmented DASH URLs (they load pretty slow in mpv)
+        if (not $args{dash_segmented}) {
+            next if ($entry->{url} =~ m{^https://manifest\.googlevideo\.com/api/manifest/dash/});
+        }
+
+        return $entry;
     }
 
     return;

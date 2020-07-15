@@ -5,6 +5,10 @@
 
 [CHANGELOG]
 
+Version 0.0.6
+
+- Added the `--hfr!` option for prefering/ignoring High Frame Rate (HFR) videos.
+
 Version 0.0.5
 
 - Added basic support for related videos (--related=videoID).

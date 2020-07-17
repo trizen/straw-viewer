@@ -2561,7 +2561,7 @@ sub print_channels {
         }
         else {
             print "\n" if $i == 0;
-            printf "%s. %s [%s]\n", colored(sprintf('%2d', $i + 1), 'bold'), $yv_utils->get_title($channel),
+            printf "%s. %s [%s]\n", colored(sprintf('%2d', $i + 1), 'bold'), $yv_utils->get_channel_title($channel),
               $yv_utils->get_publication_date($channel);
         }
     }

@@ -474,6 +474,11 @@ sub get_description {
         }
     }segi;
 
+    # Decode hashtags
+    $desc =~ s{<a href="/results\?search_query=.*?".*?>(.*?)</a>}{
+        $1
+    }segi;
+
     # Decode internal links to videos / playlists
     $desc =~ s{<a href="/(watch\?.*?)".*?>(https://www\.youtube\.com)/watch\?.*?</a>}{
         my $url = $2;
@@ -482,7 +487,7 @@ sub get_description {
     }segi;
 
     $desc =~ s{<br/?>}{\n}gi;
-    $desc =~ s{<a href=".*?".*?>(.*?)</a>}{$1}sgi;
+    $desc =~ s{<a href="(.*?)".*?>.*?</a>}{$1}sgi;
     $desc =~ s/<.*?>//gs;
 
     $desc = HTML::Entities::decode_entities($desc);

@@ -475,9 +475,7 @@ sub get_description {
     }segi;
 
     # Decode hashtags
-    $desc =~ s{<a href="/results\?search_query=.*?".*?>(.*?)</a>}{
-        $1
-    }segi;
+    $desc =~ s{<a href="/results\?search_query=.*?".*?>(.*?)</a>}{$1}sgi;
 
     # Decode internal links to videos / playlists
     $desc =~ s{<a href="/(watch\?.*?)".*?>(https://www\.youtube\.com)/watch\?.*?</a>}{

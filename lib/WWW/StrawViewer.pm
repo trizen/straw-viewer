@@ -93,7 +93,7 @@ my %valid_options = (
     refresh_token => {valid => [qr/^.{15}/], default => undef},
 
     authentication_file => {valid => [qr/^./],             default => undef},
-    api_host            => {valid => [qr{[-\w]+\.[-\w]+}], default => "https://invidio.us"},
+    api_host            => {valid => [qr{[-\w]+\.[-\w]+}], default => "https://invidious.snopyta.org"},
 
     # No input value allowed
     api_path         => {valid => q[], default => '/api/v1/'},
@@ -501,6 +501,12 @@ sub get_api_url {
 
     if ($host =~ m{^[-\w]+(?>\.[-\w]+)+\z}) {    # no protocol specified
         $host = 'https://' . $host;              # default to HTTPS
+    }
+
+    # After October 1st, the invidio.us API will no longer work.
+    # Starting with September 30th, use "invidious.snopyta.org" instead.
+    if (time > 1601424000 and $host =~ m{^https://(?:www\.)?invidio\.us\b}) {
+        $host = "https://invidious.snopyta.org";
     }
 
     join('', $host, $self->get_api_path);

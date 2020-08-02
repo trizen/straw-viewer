@@ -486,6 +486,16 @@ sub get_description {
         "$url/$params";
     }segi;
 
+    # Decode internal youtu.be links
+    $desc =~ s{<a href="/watch\?v=(.*?)".*?>(https://youtu\.be)/.*?</a>}{
+        my $url = $2;
+        my $params = URI::Escape::uri_unescape($1);
+        "$url/$params";
+    }segi;
+
+    # Decode other internal links
+    $desc =~ s{<a href="/(.*?)".*?>.*?</a>}{https://youtube.com/$1}sgi;
+
     $desc =~ s{<br/?>}{\n}gi;
     $desc =~ s{<a href="(.*?)".*?>.*?</a>}{$1}sgi;
     $desc =~ s/<.*?>//gs;

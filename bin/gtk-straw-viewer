@@ -417,10 +417,10 @@ local $SIG{__DIE__} = sub {
                 "\nThe module $module is required!\n\nTo install it, just type in terminal:\n\tsudo cpan $module\n";
             }
           }
-          . "\n=>> Previous warnings:\n" . get_text($warnings_textview)
+          . "\n\n=>> Previous warnings:\n" . get_text($warnings_textview)
     );
 
-    warn $error;
+    warn "$error\n";
     $errors_window->show;
     return 1;
 };
@@ -2510,8 +2510,6 @@ sub display_results {
         die "No results...\n";
     }
 
-    add_results_to_history($results) if not $from_history;
-
     my $url   = $results->{url};
     #my $info  = $results->{results} // {};
     my $items = $results->{results} // [];
@@ -2528,12 +2526,21 @@ sub display_results {
             $items = $items->{playlists};
         }
         else {
-            warn "[!] No results...\n";
-            $items = [];
+            die "No results...\n";
         }
     }
 
-    hide_feeds_window();
+    if (ref($items) ne 'ARRAY') {
+        die
+          "Probably " . $yv_obj->get_api_host() . " is down.\n"
+        . "\nTry changing the `api_host` in configuration file:\n\n"
+        . qq{\tapi_host => "yewtu.be",\n}
+        . qq{\nSee also: https://github.com/trizen/straw-viewer#invidious-instances\n};
+    }
+
+    if (@$items) {
+        add_results_to_history($results) if not $from_history;
+    }
 
     #~ if (not $from_history) {
 

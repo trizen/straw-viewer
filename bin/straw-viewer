@@ -3596,7 +3596,7 @@ sub print_videos {
 
     if (ref($videos) ne 'ARRAY') {
         say "\n:: Probably ", $yv_obj->get_api_host, " is down. Try:";
-        say "\n\t$0 --api=yewtu.be\n";
+        say "\n\t$0 --api=invidious.13ad.de\n";
         say "See also: https://github.com/trizen/straw-viewer#invidious-instances";
         return;
     }

@@ -2534,7 +2534,7 @@ sub display_results {
         die
           "Probably " . $yv_obj->get_api_host() . " is down.\n"
         . "\nTry changing the `api_host` in configuration file:\n\n"
-        . qq{\tapi_host => "yewtu.be",\n}
+        . qq{\tapi_host => "invidious.13ad.de",\n}
         . qq{\nSee also: https://github.com/trizen/straw-viewer#invidious-instances\n};
     }
 

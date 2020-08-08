@@ -3588,10 +3588,17 @@ sub print_videos {
     }
 
     my $url    = $results->{url};
-    my $videos   = $results->{results} // [];
+    my $videos = $results->{results} // [];
 
     if (ref($videos) eq 'HASH' and exists $videos->{videos}) {
         $videos = $videos->{videos};
+    }
+
+    if (ref($videos) ne 'ARRAY') {
+        say "\n:: Probably ", $yv_obj->get_api_host, " is down. Try:";
+        say "\n\t$0 --api=yewtu.be\n";
+        say "See also: https://github.com/trizen/straw-viewer#invidious-instances";
+        return;
     }
 
     #my $videos = $info->{items} // [];

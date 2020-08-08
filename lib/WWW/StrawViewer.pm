@@ -497,6 +497,10 @@ sub get_api_url {
 
     my $host = $self->get_api_host;
 
+    # Remove whitespace (if any)
+    $host =~ s/^\s+//;
+    $host =~ s/\s+\z//;
+
     $host =~ s{/+\z}{};    # remove trailing '/'
 
     if ($host =~ m{^[-\w]+(?>\.[-\w]+)+\z}) {    # no protocol specified
@@ -504,9 +508,11 @@ sub get_api_url {
     }
 
     # After October 1st, the invidio.us API will no longer work.
-    # Starting with September 30th, use "invidious.snopyta.org" instead.
-    if (time > 1601424000 and $host =~ m{^https://(?:www\.)?invidio\.us\b}) {
+    # Use "invidious.snopyta.org" instead.
+    if ($host =~ m{^https://(?:www\.)?invidio\.us\b}) {
         $host = "https://invidious.snopyta.org";
+        ##print STDERR ":: Changing the API host to $host\n";
+        $self->set_api_host($host);
     }
 
     join('', $host, $self->get_api_path);

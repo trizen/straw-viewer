@@ -210,7 +210,7 @@ my %CONFIG = (
     cache_dir     => undef,
 
     # API
-    api_host => "https://invidio.us",
+    api_host => "https://invidious.snopyta.org",
 
     # Others
     autoplay_mode        => 0,

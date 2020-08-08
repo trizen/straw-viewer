@@ -204,7 +204,7 @@ my %CONFIG = (
     comments_order => 'top',    # valid values: time, relevance
 
     # API
-    api_host => "https://invidio.us",
+    api_host => "https://invidious.snopyta.org",
 
     # URI options
     thumbnail_type       => 'medium',

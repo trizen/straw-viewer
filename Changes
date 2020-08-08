@@ -5,6 +5,10 @@
 
 [CHANGELOG]
 
+Version 0.0.7
+
+- Changed the default invidious instance to invidious.snopyta.org.
+
 Version 0.0.6
 
 - Added the `--hfr!` option for prefering/ignoring High Frame Rate (HFR) videos.

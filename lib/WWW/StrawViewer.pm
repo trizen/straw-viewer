@@ -277,7 +277,7 @@ sub set_lwp_useragent {
         show_progress => $self->get_debug,
         agent         => $self->get_lwp_agent,
 
-        ssl_opts => {verify_hostname => 1, SSL_version => 'TLSv1_2'},
+        ssl_opts => {verify_hostname => 1},
 
         $lwp eq 'LWP::UserAgent::Cached'
         ? (

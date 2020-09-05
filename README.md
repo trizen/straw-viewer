@@ -95,16 +95,16 @@ To package this application, run the following commands:
 
 ### INVIDIOUS INSTANCES
 
-Sometimes, the default instance, [invidio.us](https://invidio.us/), may fail to work properly. When this happens, we can change the API host to some other instance of invidious, such as [invidious.snopyta.org](https://invidious.snopyta.org/).
+Sometimes, the default instance, [invidious.snopyta.org](https://invidious.snopyta.org/), may fail to work properly. When this happens, we can change the API host to some other instance of invidious, such as [invidious.fdn.fr](https://invidious.fdn.fr/).
 
 ```console
-    straw-viewer --api=invidious.snopyta.org
+    straw-viewer --api=invidious.fdn.fr
 ```
 
 This can be changed permanently, by setting in the configuration file:
 
 ```perl
-    api_host => "invidious.snopyta.org",
+    api_host => "invidious.fdn.fr",
 ```
 
 The available instances are listed at: https://instances.invidio.us/

@@ -788,7 +788,8 @@ usage: $execname [options] ([url] | [keywords])
        --use-colors!    : enable or disable the ANSI colors for text
 
  * Other
-   --api-host=s         : set an API host from https://instances.invidio.us/
+   --api=s              : set an API host from https://instances.invidio.us/
+   --api=auto           : use a random instance of invidious
    --proxy=s            : set HTTP(S)/SOCKS proxy: 'proto://domain.tld:port/'
                           If authentication required,
                           use 'proto://user:pass\@domain.tld:port/'

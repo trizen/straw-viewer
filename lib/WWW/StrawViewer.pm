@@ -495,6 +495,7 @@ sub _append_url_args {
 sub get_invidious_instances {
     my ($self) = @_;
 
+    require File::Spec;
     my $instances_file = File::Spec->catfile($self->get_config_dir, 'instances.json');
 
     # Get the "instances.json" file when the local copy is too old or non-existent
@@ -508,7 +509,7 @@ sub get_invidious_instances {
 
         $resp->is_success() or return;
 
-        my $json = $resp->decoded_content() // return;
+        my $json = $resp->decoded_content() || return;
         open(my $fh, '>', $instances_file) or return;
         print $fh $json;
         close $fh;

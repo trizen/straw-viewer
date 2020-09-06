@@ -109,7 +109,7 @@ To make the change permanent, set in the configuration file:
 
 Alternatively, by setting `api_host` to `"auto"`, straw-viewer will automatically pick a random invidious instance:
 
-```console
+```perl
     api_host => "auto",
 ```
 

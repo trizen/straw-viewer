@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  straw-viewer
 #  Fork: 14 February 2020
-#  Edit: 26 August 2020
+#  Edit: 06 September 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -210,7 +210,7 @@ my %CONFIG = (
     cache_dir     => undef,
 
     # API
-    api_host => "https://invidious.snopyta.org",
+    api_host => "auto",
 
     # Others
     autoplay_mode        => 0,

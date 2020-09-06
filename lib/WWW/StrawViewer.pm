@@ -92,8 +92,8 @@ my %valid_options = (
     access_token  => {valid => [qr/^.{15}/], default => undef},
     refresh_token => {valid => [qr/^.{15}/], default => undef},
 
-    authentication_file => {valid => [qr/^./],             default => undef},
-    api_host            => {valid => [qr{[-\w]+\.[-\w]+}], default => "https://invidious.snopyta.org"},
+    authentication_file => {valid => [qr/^./], default => undef},
+    api_host            => {valid => [qr/\w/], default => "auto"},
 
     # No input value allowed
     api_path         => {valid => q[], default => '/api/v1/'},
@@ -492,6 +492,78 @@ sub _append_url_args {
       : $url;
 }
 
+sub get_invidious_instances {
+    my ($self) = @_;
+
+    my $instances_file = File::Spec->catfile($self->get_config_dir, 'instances.json');
+
+    # Get the "instances.json" file when the local copy is too old or non-existent
+    if ((not -e $instances_file) or (-M _) > 1 / 24) {
+
+        require LWP::UserAgent;
+
+        my $lwp = LWP::UserAgent->new(timeout => 10);
+        $lwp->show_progress(1) if $self->get_debug;
+        my $resp = $lwp->get("https://instances.invidio.us/instances.json");
+
+        $resp->is_success() or return;
+
+        my $json = $resp->decoded_content() // return;
+        open(my $fh, '>', $instances_file) or return;
+        print $fh $json;
+        close $fh;
+    }
+
+    open(my $fh, '<', $instances_file) or return;
+
+    my $json_string = do {
+        local $/;
+        <$fh>;
+    };
+
+    $self->parse_json_string($json_string);
+}
+
+sub pick_random_instance {
+    my ($self) = @_;
+
+    state $instances = $self->get_invidious_instances;
+
+    ref($instances) eq 'ARRAY' or return;
+
+    # These appear to not work properly with straw-viewer
+    my %ignored = (
+                   'yewtu.be'                 => 1,
+                   'invidious.xyz'            => 1,
+                   'vid.mint.lgbt'            => 1,
+                   'invidious.ggc-project.de' => 1,
+                  );
+
+    my @candidates =
+      grep { not $ignored{$_->[0]} }
+      grep { ref($_->[1]{monitor}) eq 'HASH' ? ($_->[1]{monitor}{statusClass} eq 'success') : 1 }
+      grep { lc($_->[1]{type} // '') eq 'https' } @$instances;
+
+    if ($self->get_debug) {
+        print STDERR ":: Found ", scalar(@candidates), " invidious instances.\n";
+    }
+
+    return $candidates[rand @candidates];
+}
+
+sub pick_and_set_random_instance {
+    my ($self) = @_;
+
+    my $instance = $self->pick_random_instance() // return;
+
+    ref($instance) eq 'ARRAY' or return;
+
+    my $uri = $instance->[1]{uri} // return;
+    $uri =~ s{/+\z}{};    # remove trailing '/'
+
+    $self->set_api_host($uri);
+}
+
 sub get_api_url {
     my ($self) = @_;
 
@@ -507,12 +579,18 @@ sub get_api_url {
         $host = 'https://' . $host;              # default to HTTPS
     }
 
-    # After October 1st, the invidio.us API will no longer work.
-    # Use "invidious.snopyta.org" instead.
-    if ($host =~ m{^https://(?:www\.)?invidio\.us\b}) {
-        $host = "https://invidious.snopyta.org";
-        ##print STDERR ":: Changing the API host to $host\n";
-        $self->set_api_host($host);
+    # Pick a random instance when `--instance=auto` or `--instance=invidio.us`.
+    if ($host eq 'auto' or $host =~ m{^https://(?:www\.)?invidio\.us\b}) {
+
+        if (defined($self->pick_and_set_random_instance())) {
+            $host = $self->get_api_host();
+            print STDERR ":: Changed the instance to: $host\n" if $self->get_debug;
+        }
+        else {
+            $host = "https://invidious.snopyta.org";
+            $self->set_api_host($host);
+            print STDERR ":: Failed to change the instance. Using: $host\n" if $self->get_debug;
+        }
     }
 
     join('', $host, $self->get_api_path);
@@ -921,7 +999,7 @@ sub get_streaming_urls {
             }
 
             if ($url->{type} =~ /\bvideo\b/i) {
-                if ($url->{type} =~ /\bav[0-9]+\b/i) {  # AV1
+                if ($url->{type} =~ /\bav[0-9]+\b/i) {    # AV1
                     if ($self->get_prefer_av1) {
                         push @video_urls, $url;
                     }

@@ -537,9 +537,11 @@ sub pick_random_instance {
     # These appear to not work properly with straw-viewer
     my %ignored = (
                    'yewtu.be'                 => 1,
+                   'invidiou.site'            => 1,
                    'invidious.xyz'            => 1,
                    'vid.mint.lgbt'            => 1,
                    'invidious.ggc-project.de' => 1,
+                   'invidious.toot.koeln'     => 1,
                    'invidious.snopyta.org'    => 1,     # too popular == too slow
                   );
 

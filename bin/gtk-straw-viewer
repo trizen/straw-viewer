@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 06 September 2020
+#  Edit: 09 September 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -221,6 +221,9 @@ my %CONFIG = (
     # Others
     env_proxy   => 1,
     http_proxy  => undef,
+    timeout     => undef,
+    user_agent  => undef,
+    cookie_file => undef,
     prefer_fork => (($^O eq 'linux') ? 0 : 1),
     debug       => 0,
     fullscreen  => 0,
@@ -807,12 +810,14 @@ my $yv_obj = WWW::StrawViewer->new(
                                      escape_utf8         => 1,
                                      config_dir          => $config_dir,
                                      hl                  => $CONFIG{hl},
-                                     lwp_env_proxy       => $CONFIG{env_proxy},
+                                     env_proxy           => $CONFIG{env_proxy},
                                      cache_dir           => $CONFIG{cache_dir},
-                                     authentication_file => $authentication_file,
-                                    );
+                                     cookie_file         => $CONFIG{cookie_file},
+                                     user_agent          => $CONFIG{user_agent},
+                                     timeout             => $CONFIG{timeout},
+                                );
 
-$yv_obj->load_authentication_tokens();
+#$yv_obj->load_authentication_tokens();
 
 if (defined $yv_obj->get_access_token()) {
     show_user_panel();
@@ -823,7 +828,7 @@ else {
 
 require WWW::StrawViewer::Utils;
 my $yv_utils = WWW::StrawViewer::Utils->new(thousand_separator => $CONFIG{thousand_separator},
-                                              youtube_url_format => $CONFIG{youtube_video_url},);
+                                            youtube_url_format => $CONFIG{youtube_video_url},);
 
 # Set default combobox values
 $definition_combobox->set_active(0);
@@ -863,7 +868,8 @@ sub apply_configuration {
                              videoEmbeddable videoLicense
                              publishedAfter publishedBefore
                              regionCode videoCategoryId
-                             debug http_proxy
+                             debug http_proxy user_agent
+                             timeout cookie_file
                              )
       ) {
 

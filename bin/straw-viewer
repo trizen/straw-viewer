@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  straw-viewer
 #  Fork: 14 February 2020
-#  Edit: 06 September 2020
+#  Edit: 09 September 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -215,6 +215,9 @@ my %CONFIG = (
     # Others
     autoplay_mode        => 0,
     http_proxy           => undef,
+    cookie_file          => undef,
+    user_agent           => undef,
+    timeout              => undef,
     env_proxy            => 1,
     confirm              => 0,
     debug                => 0,
@@ -599,13 +602,16 @@ my $yv_obj = WWW::StrawViewer->new(
                                      escape_utf8         => 1,
                                      config_dir          => $config_dir,
                                      cache_dir           => $opt{cache_dir},
-                                     lwp_env_proxy       => $opt{env_proxy},
-                                     authentication_file => $authentication_file,
-                                    );
+                                     env_proxy           => $opt{env_proxy},
+                                     cookie_file         => $opt{cookie_file},
+                                     http_proxy          => $opt{http_proxy},
+                                     user_agent          => $opt{user_agent},
+                                     timeout             => $opt{timeout},
+                                );
 
 require WWW::StrawViewer::Utils;
 my $yv_utils = WWW::StrawViewer::Utils->new(youtube_url_format => $opt{youtube_video_url},
-                                              thousand_separator => $opt{thousand_separator},);
+                                            thousand_separator => $opt{thousand_separator},);
 
 {    # Apply the configuration file
     my %temp = %CONFIG;
@@ -790,6 +796,8 @@ usage: $execname [options] ([url] | [keywords])
  * Other
    --api=s              : set an API host from https://instances.invidio.us/
    --api=auto           : use a random instance of invidious
+   --cookies=s          : file to read cookies from and dump cookie
+   --user-agent=s       : specify a custom user agent
    --proxy=s            : set HTTP(S)/SOCKS proxy: 'proto://domain.tld:port/'
                           If authentication required,
                           use 'proto://user:pass\@domain.tld:port/'
@@ -1091,7 +1099,8 @@ sub apply_configuration {
                              publishedAfter publishedBefore
                              safeSearch regionCode debug hl
                              http_proxy page comments_order
-                             subscriptions_order
+                             subscriptions_order user_agent
+                             cookie_file timeout
                              )
       ) {
 
@@ -1512,7 +1521,9 @@ sub parse_arguments {
         'related-videos|rv=s'         => \$opt{related_videos},
         'popular-videos|popular|pv=s' => \$opt{popular_videos},
 
-        'http_proxy|http-proxy|proxy=s' => \$opt{http_proxy},
+        'cookie-file|cookies=s'          => \$opt{cookie_file},
+        'user-agent|agent=s'             => \$opt{user_agent},
+        'http-proxy|https-proxy|proxy=s' => \$opt{http_proxy},
 
         'catlang|cl|hl=s'        => \$opt{hl},
         'category|cat-id|cat=s'  => \$opt{category_id},

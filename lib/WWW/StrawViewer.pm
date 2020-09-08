@@ -102,8 +102,10 @@ my %valid_options = (
     video_info_args  => {valid => q[], default => '?video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en'},
     www_content_type => {valid => q[], default => 'application/x-www-form-urlencoded'},
 
+#<<<
     # LWP user agent
-    lwp_agent => {valid => [qr/^.{5}/], default => 'Mozilla/5.0 (X11; U; Linux i686; gzip; en-US) Chrome/10.0.648.45'},
+    lwp_agent => {valid => [qr/^.{5}/], default => 'Mozilla/5.0 (Windows NT 10.0; Win64; gzip; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.0.0 Safari/537.36'},
+#>>>
 );
 
 sub _our_smartmatch {
@@ -538,6 +540,7 @@ sub pick_random_instance {
                    'invidious.xyz'            => 1,
                    'vid.mint.lgbt'            => 1,
                    'invidious.ggc-project.de' => 1,
+                   'invidious.snopyta.org'    => 1,     # too popular == too slow
                   );
 
     my @candidates =

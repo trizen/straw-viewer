@@ -527,14 +527,13 @@ sub get_invidious_instances {
     $self->parse_json_string($json_string);
 }
 
-sub pick_random_instance {
+sub select_good_invidious_instances {
     my ($self) = @_;
 
     state $instances = $self->get_invidious_instances;
 
     ref($instances) eq 'ARRAY' or return;
 
-    # These appear to not work properly with straw-viewer
     my %ignored = (
                    'yewtu.be'                 => 1,
                    'invidiou.site'            => 1,
@@ -542,7 +541,7 @@ sub pick_random_instance {
                    'vid.mint.lgbt'            => 1,
                    'invidious.ggc-project.de' => 1,
                    'invidious.toot.koeln'     => 1,
-                   'invidious.snopyta.org'    => 1,     # too popular == too slow
+                   'invidious.snopyta.org'    => 1,    # too popular == too slow
                   );
 
     my @candidates =
@@ -554,7 +553,13 @@ sub pick_random_instance {
         print STDERR ":: Found ", scalar(@candidates), " invidious instances.\n";
     }
 
-    return $candidates[rand @candidates];
+    return @candidates;
+}
+
+sub pick_random_instance {
+    my ($self) = @_;
+    my @candidates = $self->select_good_invidious_instances();
+    $candidates[rand @candidates];
 }
 
 sub pick_and_set_random_instance {
@@ -644,12 +649,36 @@ sub _make_feed_url {
 sub _extract_from_invidious {
     my ($self, $videoID) = @_;
 
-    my $url = sprintf($self->get_api_url . "videos/%s?fields=formatStreams,adaptiveFormats", $videoID);
+    my @instances = $self->select_good_invidious_instances();
 
-    my $tries = 3;
-    my $resp  = $self->{lwp}->get($url);
+    if (@instances) {
+        require List::Util;
+        @instances = List::Util::shuffle(map { $_->[0] } @instances);
+        push @instances, 'invidious.13ad.de';
+    }
+    else {
+        @instances = qw(
+          invidious.13ad.de
+          invidious.fdn.fr
+          invidious.site
+          invidious.tube
+          invidious.snopyta.org
+          );
+    }
 
-    while (not $resp->is_success() and $resp->status_line() =~ /read timeout/i and --$tries >= 0) {
+    if ($self->get_debug) {
+        print STDERR ":: Invidious instances: @instances\n";
+    }
+
+    my $tries      = 2 * scalar(@instances);
+    my $instance   = shift(@instances);
+    my $url_format = "https://%s/api/v1/videos/%s?fields=formatStreams,adaptiveFormats";
+    my $url        = sprintf($url_format, $instance, $videoID);
+
+    my $resp = $self->{lwp}->get($url);
+
+    while (not $resp->is_success() and --$tries >= 0) {
+        $url  = sprintf($url_format, shift(@instances), $videoID) if (@instances and ($tries % 2 == 0));
         $resp = $self->{lwp}->get($url);
     }
 

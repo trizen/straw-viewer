@@ -2512,10 +2512,6 @@ sub get_pixbuf_thumbnail_from_entry {
 sub display_results {
     my ($results, $from_history) = @_;
 
-    if (not $yv_utils->has_entries($results)) {
-        die "No results...\n";
-    }
-
     my $url   = $results->{url};
     #my $info  = $results->{results} // {};
     my $items = $results->{results} // [];
@@ -2532,7 +2528,7 @@ sub display_results {
             $items = $items->{playlists};
         }
         else {
-            die "No results...\n";
+            warn "No results...\n";
         }
     }
 
@@ -2546,6 +2542,10 @@ sub display_results {
         . "\nTry changing the `api_host` in configuration file:\n\n"
         . qq{\tapi_host => "auto",\n}
         . qq{\nSee also: https://github.com/trizen/straw-viewer#invidious-instances\n};
+    }
+
+    if (not $yv_utils->has_entries($results)) {
+        die "No results...\n";
     }
 
     if (@$items) {

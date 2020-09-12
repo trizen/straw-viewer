@@ -2537,10 +2537,14 @@ sub display_results {
     }
 
     if (ref($items) ne 'ARRAY') {
+
+        my $current_instance = $yv_obj->get_api_host();
+        $yv_obj->pick_and_set_random_instance();    # set a random invidious instance
+
         die
-          "Probably " . $yv_obj->get_api_host() . " is down.\n"
+          "Probably $current_instance is down.\n"
         . "\nTry changing the `api_host` in configuration file:\n\n"
-        . qq{\tapi_host => "invidious.13ad.de",\n}
+        . qq{\tapi_host => "auto",\n}
         . qq{\nSee also: https://github.com/trizen/straw-viewer#invidious-instances\n};
     }
 

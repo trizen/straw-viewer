@@ -95,19 +95,19 @@ To package this application, run the following commands:
 
 ### INVIDIOUS INSTANCES
 
-Sometimes, the default instance, [invidious.snopyta.org](https://invidious.snopyta.org/), may fail to work properly. When this happens, we can change the API host to some other instance of invidious, such as [invidious.13ad.de](https://invidious.13ad.de/).
+Sometimes, the default instance, [invidious.snopyta.org](https://invidious.snopyta.org/), may fail to work properly. When this happens, we can change the API host to some other instance of invidious, such as [invidious.tube](https://invidious.tube/):
 
 ```console
-    straw-viewer --api=invidious.13ad.de
+    straw-viewer --api=invidious.tube
 ```
 
 To make the change permanent, set in the configuration file:
 
 ```perl
-    api_host => "invidious.13ad.de",
+    api_host => "invidious.tube",
 ```
 
-Alternatively, by setting `api_host` to `"auto"`, straw-viewer will automatically pick a random invidious instance:
+Alternatively, the following will automatically pick a random invidious instance everytime the program is started:
 
 ```perl
     api_host => "auto",

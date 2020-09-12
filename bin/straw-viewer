@@ -3589,9 +3589,6 @@ sub print_video_info {
 sub print_videos {
     my ($results, %args) = @_;
 
-   # use Data::Dump qw(pp);
-   # pp $results;
-
     if (not $yv_utils->has_entries($results)) {
         warn_no_results("video");
     }
@@ -3608,8 +3605,11 @@ sub print_videos {
     }
 
     if (ref($videos) ne 'ARRAY') {
-        say "\n:: Probably ", $yv_obj->get_api_host, " is down. Try:";
-        say "\n\t$0 --api=invidious.13ad.de\n";
+
+        my $current_instance = $yv_obj->get_api_host();
+
+        say "\n:: Probably $current_instance is down. Try:";
+        say "\n\t$0 --api=auto\n";
         say "See also: https://github.com/trizen/straw-viewer#invidious-instances";
         return;
     }

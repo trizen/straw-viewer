@@ -542,12 +542,20 @@ sub get_thumbnail_url {
     my @thumbs =  @{$info->{videoThumbnails}};
     my @wanted = grep{$_->{quality} eq $type} @thumbs;
 
+    my $url;
+
     if (@wanted) {
-        return $wanted[0]{url};
+        $url = $wanted[0]{url};
+    }
+    else {
+        warn "[!] Couldn't find thumbnail of type <<$type>>...";
+        $url = $thumbs[0]{url};
     }
 
-    warn "[!] Couldn't find thumbnail of type <<$type>>...";
-    $thumbs[0]{url};
+    # Clean URL of trackers and other junk
+    $url =~ s/\.(?:jpg|png|webp)\K\?.*//;
+
+    return $url;
 }
 
 sub get_channel_title {

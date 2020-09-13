@@ -5,6 +5,11 @@
 
 [CHANGELOG]
 
+Version 0.0.9
+
+- Support for loading cookies from a file.
+- Support for picking a random invidious instance.
+
 Version 0.0.8
 
 - Fixed the support for closed-captions for some videos.

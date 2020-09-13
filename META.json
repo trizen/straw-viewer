@@ -56,7 +56,7 @@
    "provides" : {
       "WWW::StrawViewer" : {
          "file" : "lib/WWW/StrawViewer.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.0.9"
       },
       "WWW::StrawViewer::Activities" : {
          "file" : "lib/WWW/StrawViewer/Activities.pm"
@@ -116,6 +116,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.0.8",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

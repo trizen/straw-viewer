@@ -225,6 +225,7 @@ sub video_details {
             } @{$video->{thumbnail}{thumbnails}}
         ],
 
+        liveNow       => $video->{isLiveContent},
         description   => $video->{shortDescription},
         lengthSeconds => $video->{lengthSeconds},
 

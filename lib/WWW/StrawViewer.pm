@@ -4,6 +4,12 @@ use utf8;
 use 5.016;
 use warnings;
 
+use Memoize;
+
+memoize('_get_video_info');
+memoize('_extract_from_ytdl');
+memoize('_extract_from_invidious');
+
 use parent qw(
   WWW::StrawViewer::Search
   WWW::StrawViewer::Videos
@@ -686,7 +692,8 @@ sub _extract_from_invidious {
     if (@instances) {
         require List::Util;
         @instances = List::Util::shuffle(map { $_->[0] } @instances);
-        #push @instances, 'invidious.13ad.de';
+        push @instances, 'invidious.snopyta.org';
+        push @instances, 'invidious.13ad.de';
     }
     else {
         @instances = qw(

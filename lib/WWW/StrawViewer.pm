@@ -574,7 +574,7 @@ sub select_good_invidious_instances {
 
     my %ignored = (
                    'yewtu.be'                 => 1,
-                   'invidiou.site'            => 1,
+                   'invidiou.site'            => 0,
                    'invidious.xyz'            => 1,
                    'vid.mint.lgbt'            => 1,
                    'invidious.ggc-project.de' => 1,
@@ -588,7 +588,11 @@ sub select_good_invidious_instances {
       grep { lc($_->[1]{type} // '') eq 'https' } @$instances;
 
     if ($self->get_debug) {
-        print STDERR ":: Found ", scalar(@candidates), " invidious instances.\n";
+
+        my @hosts = map { $_->[0] } @candidates;
+        my $count = scalar(@candidates);
+
+        print STDERR ":: Found $count invidious instances: @hosts\n";
     }
 
     return @candidates;

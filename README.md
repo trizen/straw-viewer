@@ -77,6 +77,10 @@ For trying the latest commit of `straw-viewer`, without installing it, execute t
 * [File::ShareDir](https://metacpan.org/release/File-ShareDir)
 * \+ the dependencies required by straw-viewer.
 
+#### Build dependencies:
+
+* [Module::Build](https://metacpan.org/pod/Module::Build)
+
 #### Optional dependencies:
 
 * Local cache support: [LWP::UserAgent::Cached](https://metacpan.org/release/LWP-UserAgent-Cached)

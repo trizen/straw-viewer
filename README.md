@@ -24,6 +24,8 @@ The project is in its early stages of development and some features are not impl
 
 * Arch Linux (AUR): https://aur.archlinux.org/packages/straw-viewer-git/
 
+* openSUSE: https://build.opensuse.org/package/show/home:Aptrug/straw-viewer
+
 * Slackware: https://slackbuilds.org/repository/14.2/multimedia/straw-viewer/
 
 

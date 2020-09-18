@@ -22,7 +22,7 @@ sub _make_guideCategories_url {
     my ($self, %opts) = @_;
 
     if (not exists $opts{id}) {
-        $opts{regionCode} //= $self->get_regionCode;
+        $opts{region} //= $self->get_region;
     }
 
     $self->_make_feed_url('guideCategories', hl => $self->get_hl, %opts);
@@ -47,7 +47,7 @@ Return info for a list of comma-separated category IDs.
                          name => 'guide_categories_info',
                         },
                         {
-                         key  => 'regionCode',
+                         key  => 'region',
                          name => 'guide_categories',
                         },
       ) {

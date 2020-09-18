@@ -21,43 +21,46 @@ WWW::StrawViewer::Search - Search functions for Straw API v3
 sub _make_search_url {
     my ($self, %opts) = @_;
 
+    my @features;
+
+    if (defined(my $vd = $self->get_videoDefinition)) {
+        if ($vd eq 'high') {
+            push @features, 'hd';
+        }
+    }
+
+    if (defined(my $vc = $self->get_videoCaption)) {
+        if ($vc eq 'true' or $vc eq '1') {
+            push @features, 'subtitles';
+        }
+    }
+
+    if (defined(my $vd = $self->get_videoDimension)) {
+        if ($vd eq '3d') {
+            push @features, '3d';
+        }
+    }
+
+    if (defined(my $license = $self->get_videoLicense)) {
+        if ($license eq 'creative_commons') {
+            push @features, 'creative_commons';
+        }
+    }
+
     return $self->_make_feed_url(
         'search',
 
-        topicId    => $self->get_topicId,
-        regionCode => $self->get_regionCode,
+        region    => $self->get_region,
+        sort_by   => $self->get_order,
+        date      => $self->get_date,
+        channelId => $self->get_channelId,
+        pageToken => $self->page_token,
+        duration  => $self->get_videoDuration,
 
-        maxResults        => $self->get_maxResults,
-        order             => $self->get_order,
-        publishedAfter    => $self->get_publishedAfter,
-        publishedBefore   => $self->get_publishedBefore,
-        regionCode        => $self->get_regionCode,
-        relevanceLanguage => $self->get_relevanceLanguage,
-        safeSearch        => $self->get_safeSearch,
-        channelId         => $self->get_channelId,
-        channelType       => $self->get_channelType,
-        pageToken         => $self->page_token,
-
-        (
-         $opts{type} eq 'video'
-         ? (
-            videoCaption    => $self->get_videoCaption,
-            videoCategoryId => $self->get_videoCategoryId,
-            videoDefinition => $self->get_videoDefinition,
-            videoDimension  => $self->get_videoDimension,
-            videoDuration   => $self->get_videoDuration,
-            videoEmbeddable => $self->get_videoEmbeddable,
-            videoLicense    => $self->get_videoLicense,
-            videoSyndicated => $self->get_videoSyndicated,
-            videoType       => $self->get_videoType,
-            eventType       => $self->get_eventType,
-           )
-         : ()
-        ),
+        (@features ? (features => join(',', @features)) : ()),
 
         %opts,
                                 );
-
 }
 
 =head2 search_for($types,$keywords;\%args)
@@ -146,19 +149,21 @@ be set to a YouTube video ID.
 sub related_to_videoID {
     my ($self, $videoID) = @_;
 
-    my %info           = $self->_get_video_info($videoID);
+    my %info                = $self->_get_video_info($videoID);
     my $watch_next_response = $self->parse_json_string($info{watch_next_response});
-    my $related = eval { $watch_next_response->{contents}{twoColumnWatchNextResults}{secondaryResults}{secondaryResults}{results} } // return { results => []};
+    my $related =
+      eval { $watch_next_response->{contents}{twoColumnWatchNextResults}{secondaryResults}{secondaryResults}{results} }
+      // return {results => []};
 
     #use Data::Dump qw(pp);
     #pp $related;
 
     my @results;
 
-    foreach my $entry(@$related) {
+    foreach my $entry (@$related) {
 
-        my $info = $entry->{compactVideoRenderer} // next;
-        my $title = $info->{title}{simpleText} // next;
+        my $info  = $entry->{compactVideoRenderer} // next;
+        my $title = $info->{title}{simpleText}     // next;
 
         my $viewCount = 0;
 
@@ -166,39 +171,39 @@ sub related_to_videoID {
             $viewCount = ($1 =~ tr/,//dr);
         }
         elsif ($info->{viewCountText}{simpleText} =~ /Recommended for you/i) {
-            next;       # filter out recommended videos from related videos
+            next;    # filter out recommended videos from related videos
         }
 
         my $lengthSeconds = 0;
 
         if ($info->{lengthText}{simpleText} =~ /([\d:]+)/) {
-            my $time = $1;
+            my $time   = $1;
             my @fields = split(/:/, $time);
 
             my $seconds = pop(@fields) // 0;
             my $minutes = pop(@fields) // 0;
-            my $hours = pop(@fields) // 0;
+            my $hours   = pop(@fields) // 0;
 
-            $lengthSeconds = 3600 * $hours + 60*$minutes + $seconds;
+            $lengthSeconds = 3600 * $hours + 60 * $minutes + $seconds;
         }
 
         my $published = 0;
         if (exists $info->{publishedTimeText} and $info->{publishedTimeText}{simpleText} =~ /(\d+)\s+(\w+)\s+ago/) {
 
             my $quantity = $1;
-            my $period = $2;
+            my $period   = $2;
 
-            $period =~ s/s\z//; # make it singural
+            $period =~ s/s\z//;    # make it singural
 
             my %table = (
-                year => 31556952,       # seconds in a year
-                month => 2629743.83,    # seconds in a month
-                week => 604800,         # seconds in a week
-                day => 86400,           # seconds in a day
-                hour => 3600,           # seconds in a hour
-                minute => 60,           # seconds in a minute
-                second => 1,            # seconds in a second
-            );
+                         year   => 31556952,      # seconds in a year
+                         month  => 2629743.83,    # seconds in a month
+                         week   => 604800,        # seconds in a week
+                         day    => 86400,         # seconds in a day
+                         hour   => 3600,          # seconds in a hour
+                         minute => 60,            # seconds in a minute
+                         second => 1,             # seconds in a second
+                        );
 
             if (exists $table{$period}) {
                 $published = int(time - $quantity * $table{$period});
@@ -209,40 +214,42 @@ sub related_to_videoID {
         }
 
         push @results, {
-            type => "video",
-            title => $title,
-            videoId => $info->{videoId},
-            author => $info->{longBylineText}{runs}[0]{text},
+            type     => "video",
+            title    => $title,
+            videoId  => $info->{videoId},
+            author   => $info->{longBylineText}{runs}[0]{text},
             authorId => $info->{longBylineText}{runs}[0]{navigationEndpoint}{browseEndpoint}{browseId},
+
             #authorUrl => $info->{longBylineText}{runs}[0]{navigationEndpoint}{browseEndpoint}{browseId},
 
-            description => $info->{accessibility}{accessibilityData}{label},
+            description     => $info->{accessibility}{accessibilityData}{label},
             descriptionHtml => undef,
-            viewCount => $viewCount,
-            published => $published,
-            publishedText => $info->{publishedTimeText}{simpleText},
-            lengthSeconds => $lengthSeconds,
-            liveNow => ($lengthSeconds == 0), # maybe it's live if lengthSeconds == 0?
-            paid => 0,
-            premium => 0,
+            viewCount       => $viewCount,
+            published       => $published,
+            publishedText   => $info->{publishedTimeText}{simpleText},
+            lengthSeconds   => $lengthSeconds,
+            liveNow         => ($lengthSeconds == 0),                              # maybe it's live if lengthSeconds == 0?
+            paid            => 0,
+            premium         => 0,
 
             videoThumbnails => [
                 map {
                     scalar {
-                        quality => 'medium',
-                        url => $_->{url},
-                        width => $_->{width},
-                        height => $_->{height},
-                    }
+                            quality => 'medium',
+                            url     => $_->{url},
+                            width   => $_->{width},
+                            height  => $_->{height},
+                           }
                 } @{$info->{thumbnail}{thumbnails}}
             ],
         };
     }
 
-    return scalar {
-        url => undef,
-        results => \@results,
-    };
+    return
+      scalar {
+              url     => undef,
+              results => \@results,
+             };
 }
 
 =head1 AUTHOR

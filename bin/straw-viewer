@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  straw-viewer
 #  Fork: 14 February 2020
-#  Edit: 13 September 2020
+#  Edit: 18 September 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -55,7 +55,7 @@ use 5.016;
 use warnings;
 no warnings 'once';
 
-my $DEVEL;    # true in devel mode
+my $DEVEL;                                 # true in devel mode
 use if ($DEVEL = 0), lib => qw(../lib);    # devel mode
 
 use WWW::StrawViewer v0.0.9;
@@ -172,7 +172,7 @@ my %CONFIG = (
     video_player_selected => (
         $constant{win32}
         ? 'vlc'
-        : undef            # auto-defined
+        : undef    # auto-defined
     ),
 
     # YouTube options
@@ -188,16 +188,15 @@ my %CONFIG = (
     safeSearch      => undef,
     videoCaption    => undef,
     videoDuration   => undef,
-    videoSyndicated => undef,
-    publishedBefore => undef,
-    publishedAfter  => undef,
-    order           => undef,
 
-    comments_order      => 'top',         # valid values: top, new
+    order => undef,
+    date  => undef,
+
+    comments_order      => 'top',          # valid values: top, new
     subscriptions_order => 'relevance',    # valid values: alphabetical, relevance, unread
 
-    hl         => 'en_US',
-    regionCode => undef,
+    hl     => 'en_US',
+    region => undef,
 
     # URI options
     youtube_video_url => 'https://www.youtube.com/watch?v=%s',
@@ -245,13 +244,13 @@ my %CONFIG = (
     highlight_watched    => 1,
     highlight_color      => 'bold',
     remove_played_file   => 0,
-    history              => undef,      # auto-defined
+    history              => undef,                    # auto-defined
     history_limit        => 100_000,
     history_file         => $history_file,
     convert_cmd          => 'ffmpeg -i *IN* *OUT*',
     convert_to           => undef,
 
-    custom_layout => undef,    # auto-defined
+    custom_layout => undef,                           # auto-defined
     custom_layout_format => [{width => 3,     align => "right", color => "bold",      text => "*NO*.",},
                              {width => "55%", align => "left",  color => "bold blue", text => "*TITLE*",},
                              {width => "15%", align => "left",  color => "yellow",    text => "*AUTHOR*",},
@@ -533,12 +532,12 @@ sub load_config {
 
     dump_configuration($config_file) if $update_config;
 
-foreach my $path($CONFIG{cache_dir}) {
-    next if -d $path;
-    require File::Path;
-    File::Path::make_path($path)
-      or warn "[!] Can't create path <<$path>>: $!";
-}
+    foreach my $path ($CONFIG{cache_dir}) {
+        next if -d $path;
+        require File::Path;
+        File::Path::make_path($path)
+          or warn "[!] Can't create path <<$path>>: $!";
+    }
 
     @opt{keys %CONFIG} = values(%CONFIG);
 }
@@ -569,7 +568,7 @@ if ($opt{history}) {
         if (not -d $dir) {
             require File::Path;
             File::Path::make_path($dir)
-                or warn "[!] Can't create path <<$dir>>: $!";
+              or warn "[!] Can't create path <<$dir>>: $!";
         }
 
         open my $fh, '>', $opt{history_file}
@@ -599,15 +598,15 @@ if ($opt{history}) {
 }
 
 my $yv_obj = WWW::StrawViewer->new(
-                                     escape_utf8         => 1,
-                                     config_dir          => $config_dir,
-                                     cache_dir           => $opt{cache_dir},
-                                     env_proxy           => $opt{env_proxy},
-                                     cookie_file         => $opt{cookie_file},
-                                     http_proxy          => $opt{http_proxy},
-                                     user_agent          => $opt{user_agent},
-                                     timeout             => $opt{timeout},
-                                );
+                                   escape_utf8 => 1,
+                                   config_dir  => $config_dir,
+                                   cache_dir   => $opt{cache_dir},
+                                   env_proxy   => $opt{env_proxy},
+                                   cookie_file => $opt{cookie_file},
+                                   http_proxy  => $opt{http_proxy},
+                                   user_agent  => $opt{user_agent},
+                                   timeout     => $opt{timeout},
+                                  );
 
 require WWW::StrawViewer::Utils;
 my $yv_utils = WWW::StrawViewer::Utils->new(youtube_url_format => $opt{youtube_video_url},
@@ -665,7 +664,6 @@ usage: $execname [options] ([url] | [keywords])
 
 * Trending
    --trending:s       : show trending videos in a given category ID or name
-                        use the `--within=s` option to restrict the results
 
  * Channels
    -sc --channels     : search for YouTube channels
@@ -678,16 +676,15 @@ usage: $execname [options] ([url] | [keywords])
  * Filtering
    --author=s           : search in videos uploaded by a specific user
    --duration=s         : filter search results based on video length
-                          valid values are: short medium long
-   --caption=s          : only videos with/without closed captions
-                          valid values are: any closedCaption none
+                          valid values: short long
+   --captions!          : only videos with or without closed captions
    --category=s         : search only for videos in a specific category name/ID
    --safe-search=s      : YouTube will skip restricted videos for your location
                           valid values are: none moderate strict
    --order=s            : order the results using a specific sorting method
-                          valid values: date rating viewCount title videoCount
-   --within=s           : show only videos uploaded within the specified time
-                          valid values are: Nd, Nw, Nm, Ny, where N is a number
+                          valid values: relevance rating upload_date view_count
+   --date=s             : short videos published in a time period
+                          valid values: hour today week month year
    --hd!                : search only for videos available in at least 720p
    --vd=s               : set the video definition (any, high or standard)
    --page=i             : get results starting with a specific page number
@@ -970,22 +967,13 @@ Results: show video comments for a specific video URL or videoID.
 Command: $execname --results=5 -up=khanacademy -D
 Results: the most recent 5 videos by a specific author (-up), printed with extra details (-D).
 
-Command: $execname --author=MIT atom
-Results: search only in videos by a specific author.
-
-Command: $execname --author=MIT atom --within=2y
-Results: search only in videos by a specific author, published in the last 2 years.
-
-Command: $execname --popular=MIT --within=6m
-Results: show the most popular videos by a specific user, published in the last 6 months.
-
 Command: $execname -S=vsauce
 Results: get the subscriptions for a username.
 
 Command: $execname --page=2 -u=Google
 Results: show latest videos uploaded by Google, starting with the page number 2.
 
-Command: $execname cats --order=viewCount --duration=short
+Command: $execname cats --order=view_count --duration=short
 Results: search for 'cats' videos, ordered by ViewCount and short duration.
 
 Command: $execname --channels math lessons
@@ -1091,13 +1079,11 @@ sub apply_configuration {
     foreach my $option_name (
                              qw(
                              api_host
-                             videoCaption maxResults order
-                             videoDefinition videoCategoryId
+                             videoCaption
+                             videoDefinition
                              videoDimension videoDuration
-                             videoEmbeddable videoLicense
-                             videoSyndicated channelId
-                             publishedAfter publishedBefore
-                             safeSearch regionCode debug hl
+                             date order
+                             channelId region debug hl
                              http_proxy page comments_order
                              subscriptions_order user_agent
                              cookie_file timeout
@@ -1163,18 +1149,6 @@ sub apply_configuration {
         }
         else {
             warn_invalid("username or channel ID", $name);
-        }
-    }
-
-    if (defined $opt->{within}) {
-        my $value = delete $opt->{within};
-
-        if ($value =~ /^\s*(\d+(?:\.\d+)?)([dwmy])/i) {
-            my $date = $yv_utils->period_to_date($1, $2);
-            $yv_obj->set_publishedAfter($date);
-        }
-        else {
-            warn "\n[!] Invalid value <$value> for option `--within`!\n";
         }
     }
 
@@ -1485,7 +1459,7 @@ sub parse_arguments {
         '720p|7'  => sub { $opt{resolution} = 720 },
         '1080p|1' => sub { $opt{resolution} = 1080 },
 
-        'hfr!' => \$opt{hfr},
+        'hfr!'             => \$opt{hfr},
         'res|resolution=s' => \$opt{resolution},
 
         'comments=s'       => \$opt{get_comments},
@@ -1527,11 +1501,12 @@ sub parse_arguments {
 
         'catlang|cl|hl=s'        => \$opt{hl},
         'category|cat-id|cat=s'  => \$opt{category_id},
-        'r|region|region-code=s' => \$opt{regionCode},
+        'r|region|region-code=s' => \$opt{region},
 
-        'orderby|order|order-by=s' => \$opt{order},
-        'duration=s'               => \$opt{videoDuration},
-        'within=s'                 => \$opt{within},
+        'order|order-by|sort|sort-by=s' => \$opt{order},
+        'date=s'                        => \$opt{date},
+
+        'duration=s' => \$opt{videoDuration},
 
         'max-seconds|max_seconds=i' => \$opt{max_seconds},
         'min-seconds|min_seconds=i' => \$opt{min_seconds},
@@ -1585,7 +1560,7 @@ sub parse_arguments {
         'colorful|colourful|C!' => \$opt{results_with_colors},
         'details|D!'            => \$opt{results_with_details},
         'fixed-width|W|fw!'     => \$opt{results_fixed_width},
-        'caption=s'             => \$opt{videoCaption},
+        'captions!'             => \$opt{videoCaption},
         'fullscreen|fs|f!'      => \$opt{fullscreen},
         'dash!'                 => \$opt{dash_support},
         'confirm!'              => \$opt{confirm},
@@ -1933,14 +1908,18 @@ sub get_user_input {
     }
 
     my $input = unpack(
-                       'A*', defined($opt{std_input})
-                       ? delete($opt{std_input})
-                       : (do {
-                            my @lines = split(/\R/, $text);
-                            say for @lines[0..$#lines-1];
-                            $term->readline($lines[-1]);
-                        } // return ':return')
-                      ) =~ s/^\s+//r;
+        'A*',
+        defined($opt{std_input})
+        ? delete($opt{std_input})
+        : (
+           do {
+               my @lines = split(/\R/, $text);
+               say for @lines[0 .. $#lines - 1];
+               $term->readline($lines[-1]);
+             }
+             // return ':return'
+          )
+    ) =~ s/^\s+//r;
 
     return q{:next} if $input eq q{};    # <ENTER> for the next page
 
@@ -2113,9 +2092,9 @@ sub get_and_play_video_ids {
             ## OK
         }
         else {
-            $info->{title} = "unknwon";
+            $info->{title}         = "unknwon";
             $info->{lengthSeconds} = 0;
-            $info->{videoId} = $id;
+            $info->{videoId}       = $id;
             warn_cant_do('get info for', $id);
         }
 
@@ -2259,12 +2238,12 @@ sub general_options {
     my $results  = $args{res};
     my $info     = $args{info};
 
-    my $token = undef;
+    my $token     = undef;
     my $has_token = 0;
 
     if (ref($info->{results}) eq 'HASH' and exists $info->{results}{continuation}) {
         $has_token = 1;
-        $token = $info->{results}{continuation};
+        $token     = $info->{results}{continuation};
     }
 
     if (not defined($option)) {
@@ -2521,7 +2500,7 @@ sub print_channels {
     }
 
     my $url      = $results->{url};
-    my $channels     = $results->{results} // [];
+    my $channels = $results->{results} // [];
 
     foreach my $i (0 .. $#{$channels}) {
         my $channel = $channels->[$i];
@@ -2543,7 +2522,7 @@ sub print_channels {
             print "\n" if $i == 0;
             printf("%s. %s (%s)\n",
                    colored(sprintf('%2d', $i + 1),                    'bold'),
-                   colored($yv_utils->get_channel_title($channel),            'blue'),
+                   colored($yv_utils->get_channel_title($channel),    'blue'),
                    colored($yv_utils->get_publication_date($channel), 'magenta'),
                   );
         }
@@ -2638,7 +2617,7 @@ sub print_comments {
 
     my $i = 0;
     foreach my $comment (@{$comments}) {
-        my $comment_id = $yv_utils->get_comment_id($comment);
+        my $comment_id  = $yv_utils->get_comment_id($comment);
         my $comment_age = $yv_utils->get_publication_age_approx($comment);
 
         printf(
@@ -2657,23 +2636,23 @@ sub print_comments {
               );
 
         #~ if (exists $comment->{replies}) {
-            #~ foreach my $reply (reverse @{$comment->{replies}{comments}}) {
-                #~ my $reply_age = $yv_utils->date_to_age($reply->{snippet}{publishedAt});
-                #~ printf(
-                       #~ "\n   %s (%s) replied:\n%s\n",
-                       #~ colored($reply->{snippet}{authorDisplayName}, 'bold'),
-                       #~ (
-                        #~ $reply_age =~ /sec|min|hour|day/
-                        #~ ? "$reply_age ago"
-                        #~ : $yv_utils->format_date($reply->{snippet}{publishedAt})
-                       #~ ),
-                       #~ wrap_text(
-                                 #~ i_tab => q{ } x 6,
-                                 #~ s_tab => q{ } x 6,
-                                 #~ text  => [$reply->{snippet}{textDisplay} // 'Empty comment...']
-                                #~ ),
-                      #~ );
-            #~ }
+        #~ foreach my $reply (reverse @{$comment->{replies}{comments}}) {
+        #~ my $reply_age = $yv_utils->date_to_age($reply->{snippet}{publishedAt});
+        #~ printf(
+        #~ "\n   %s (%s) replied:\n%s\n",
+        #~ colored($reply->{snippet}{authorDisplayName}, 'bold'),
+        #~ (
+        #~ $reply_age =~ /sec|min|hour|day/
+        #~ ? "$reply_age ago"
+        #~ : $yv_utils->format_date($reply->{snippet}{publishedAt})
+        #~ ),
+        #~ wrap_text(
+        #~ i_tab => q{ } x 6,
+        #~ s_tab => q{ } x 6,
+        #~ text  => [$reply->{snippet}{textDisplay} // 'Empty comment...']
+        #~ ),
+        #~ );
+        #~ }
         #~ }
     }
 
@@ -3044,12 +3023,12 @@ sub get_streaming_url {
     if (ref($captions) eq 'ARRAY' and @$captions and $opt{get_captions} and not $opt{novideo}) {
         require WWW::StrawViewer::GetCaption;
         my $yv_cap = WWW::StrawViewer::GetCaption->new(
-                                                         auto_captions => $opt{auto_captions},
-                                                         captions_dir  => $opt{cache_dir},
-                                                         captions      => $captions,
-                                                         languages     => $CONFIG{srt_languages},
-                                                         yv_obj        => $yv_obj,
-                                                        );
+                                                       auto_captions => $opt{auto_captions},
+                                                       captions_dir  => $opt{cache_dir},
+                                                       captions      => $captions,
+                                                       languages     => $CONFIG{srt_languages},
+                                                       yv_obj        => $yv_obj,
+                                                      );
         $srt_file = $yv_cap->save_caption($video_id);
     }
 
@@ -3073,7 +3052,7 @@ sub get_streaming_url {
                                     resolution     => ($opt{novideo} ? 'audio' : $opt{resolution}),
                                     hfr            => $opt{hfr},
                                     dash           => $dash,
-                                    dash_mp4_audio => ($opt{novideo} ? 1 : $opt{dash_mp4_audio}),
+                                    dash_mp4_audio => ($opt{novideo}        ? 1 : $opt{dash_mp4_audio}),
                                     dash_segmented => ($opt{download_video} ? 0 : $opt{dash_segmented}),
                                    );
 
@@ -3565,23 +3544,26 @@ sub print_video_info {
 
     $rep = 0 if $rep < 0;
 
-    print("\n$hr\n", q{ } x $rep => (_bold_color("=>> $title <<=") . "\n\n"),
-      (
-        map  { sprintf(q{-> } . "%-*s: %s\n", $opt{_colors} ? 18 : 10, _bold_color($_->[0]), $_->[1]) }
-        grep { defined($_->[1]) and $_->[1] !~ /^(0|unknown)\z/i } (
-           ['Channel'    => $yv_utils->get_channel_title($video)],
-           ['ChannelID'  => $yv_utils->get_channel_id($video)],
-           ['VideoID'    => $yv_utils->get_video_id($video)],
-           ['Category'   => $yv_utils->get_category_name($video)],
-           ['Definition' => $yv_utils->get_definition($video)],
-           ['Duration'   => $yv_utils->get_time($video)],
-           ['Likes'      => $yv_utils->set_thousands($yv_utils->get_likes($video))],
-           ['Dislikes'   => $yv_utils->set_thousands($yv_utils->get_dislikes($video))],
-           ['Views'      => $yv_utils->set_thousands($yv_utils->get_views($video))],
-           ['Published'  => $yv_utils->get_publication_date($video)],
-        )
-      ),
-    "$hr\n");
+    print(
+          "\n$hr\n",
+          q{ } x $rep => (_bold_color("=>> $title <<=") . "\n\n"),
+          (
+           map    { sprintf(q{-> } . "%-*s: %s\n", $opt{_colors} ? 18 : 10, _bold_color($_->[0]), $_->[1]) }
+             grep { defined($_->[1]) and $_->[1] !~ /^(0|unknown)\z/i } (
+                                                     ['Channel'    => $yv_utils->get_channel_title($video)],
+                                                     ['ChannelID'  => $yv_utils->get_channel_id($video)],
+                                                     ['VideoID'    => $yv_utils->get_video_id($video)],
+                                                     ['Category'   => $yv_utils->get_category_name($video)],
+                                                     ['Definition' => $yv_utils->get_definition($video)],
+                                                     ['Duration'   => $yv_utils->get_time($video)],
+                                                     ['Likes'      => $yv_utils->set_thousands($yv_utils->get_likes($video))],
+                                                     ['Dislikes' => $yv_utils->set_thousands($yv_utils->get_dislikes($video))],
+                                                     ['Views'    => $yv_utils->set_thousands($yv_utils->get_views($video))],
+                                                     ['Published' => $yv_utils->get_publication_date($video)],
+             )
+          ),
+          "$hr\n"
+         );
 
     return 1;
 }
@@ -3617,24 +3599,24 @@ sub print_videos {
     #my $videos = $info->{items} // [];
 
     #~ foreach my $entry (@$videos) {
-        #~ if ($yv_utils->is_activity($entry)) {
-            #~ my $type = $entry->{snippet}{type};
+    #~ if ($yv_utils->is_activity($entry)) {
+    #~ my $type = $entry->{snippet}{type};
 
-            #~ if ($type eq 'upload') {
-                #~ $entry->{kind} = 'youtube#video';
-                #~ $entry->{id}   = $entry->{contentDetails}{upload}{videoId};
-            #~ }
+    #~ if ($type eq 'upload') {
+    #~ $entry->{kind} = 'youtube#video';
+    #~ $entry->{id}   = $entry->{contentDetails}{upload}{videoId};
+    #~ }
 
-            #~ if ($type eq 'playlistItem') {
-                #~ $entry->{kind} = 'youtube#video';
-                #~ $entry->{id}   = $entry->{contentDetails}{playlistItem}{resourceId}{videoId};
-            #~ }
+    #~ if ($type eq 'playlistItem') {
+    #~ $entry->{kind} = 'youtube#video';
+    #~ $entry->{id}   = $entry->{contentDetails}{playlistItem}{resourceId}{videoId};
+    #~ }
 
-            #~ if ($type eq 'bulletin' and $entry->{contentDetails}{bulletin}{resourceId}{kind} eq 'youtube#video') {
-                #~ $entry->{kind} = 'youtube#video';
-                #~ $entry->{id}   = $entry->{contentDetails}{bulletin}{resourceId}{videoId};
-            #~ }
-        #~ }
+    #~ if ($type eq 'bulletin' and $entry->{contentDetails}{bulletin}{resourceId}{kind} eq 'youtube#video') {
+    #~ $entry->{kind} = 'youtube#video';
+    #~ $entry->{id}   = $entry->{contentDetails}{bulletin}{resourceId}{videoId};
+    #~ }
+    #~ }
     #~ }
 
 #<<<
@@ -3654,16 +3636,16 @@ sub print_videos {
 
     #~ if (@{$videos} and not $results->{has_extra_info}) {
 
-        #~ my @video_ids       = grep { defined } map { $yv_utils->get_video_id($_) } @{$videos};
-        #~ my $content_details = $yv_obj->video_details(join(',', @video_ids), VIDEO_PART);
-        #~ my $video_details   = $content_details->{results}{items};
+    #~ my @video_ids       = grep { defined } map { $yv_utils->get_video_id($_) } @{$videos};
+    #~ my $content_details = $yv_obj->video_details(join(',', @video_ids), VIDEO_PART);
+    #~ my $video_details   = $content_details->{results}{items};
 
-        #~ foreach my $i (0 .. $#{$videos}) {
-            #~ @{$videos->[$i]}{qw(id contentDetails statistics snippet)} =
-              #~ @{$video_details->[$i]}{qw(id contentDetails statistics snippet)};
-        #~ }
+    #~ foreach my $i (0 .. $#{$videos}) {
+    #~ @{$videos->[$i]}{qw(id contentDetails statistics snippet)} =
+    #~ @{$video_details->[$i]}{qw(id contentDetails statistics snippet)};
+    #~ }
 
-        #~ $results->{has_extra_info} = 1;
+    #~ $results->{has_extra_info} = 1;
     #~ }
 
 #<<<
@@ -3792,7 +3774,7 @@ sub print_videos {
               sprintf(
                       "%s. %s (by %s) [%s]\n",
                       colored(sprintf('%2d', $i + 1), 'bold'), $yv_utils->get_title($video),
-                      $yv_utils->get_channel_title($video), $yv_utils->get_time($video),
+                      $yv_utils->get_channel_title($video),    $yv_utils->get_time($video),
                      );
         }
     }
@@ -3821,7 +3803,7 @@ sub print_videos {
               ) {
                 if ($opt{play_backwards}) {
                     if (defined($url)) {
-                            __SUB__->($yv_obj->previous_page($url), auto => 1);
+                        __SUB__->($yv_obj->previous_page($url), auto => 1);
                     }
                     else {
                         $opt{play_backwards} = 0;

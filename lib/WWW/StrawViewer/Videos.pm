@@ -74,12 +74,7 @@ sub trending_videos_from_category {
     my ($self, $cat_id) = @_;
 
     my $results = do {
-        local $self->{publishedAfter} = do {
-            state $yv_utils = WWW::StrawViewer::Utils->new;
-            $yv_utils->period_to_date(1, 'w');
-        } if !defined($self->get_publishedAfter);
         local $self->{videoCategoryId} = $cat_id;
-        local $self->{regionCode}      = "US" if !defined($self->get_regionCode);
         $self->search_videos("");
     };
 

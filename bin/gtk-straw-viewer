@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 13 September 2020
+#  Edit: 18 September 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -28,7 +28,7 @@ use 5.016;
 use warnings;
 no warnings 'once';
 
-my $DEVEL;    # true in devel mode
+my $DEVEL;                                 # true in devel mode
 use if ($DEVEL = 0), lib => qw(../lib);    # devel only
 
 use WWW::StrawViewer v0.0.9;
@@ -53,9 +53,9 @@ my $version = $WWW::StrawViewer::VERSION;
 
 # Share directory
 my $share_dir =
-    ($DEVEL and -d "../share")
-    ? '../share'
-    : do { require File::ShareDir; File::ShareDir::dist_dir('WWW-StrawViewer') };
+  ($DEVEL and -d "../share")
+  ? '../share'
+  : do { require File::ShareDir; File::ShareDir::dist_dir('WWW-StrawViewer') };
 
 # Configuration dir/file
 my $home_dir;
@@ -183,25 +183,21 @@ my %CONFIG = (
     hpaned_position             => 420,
 
     # Straw options
-    dash_support    => 1,
-    dash_mp4_audio  => 1,
-    dash_segmented  => 1,         # may load slow
-    prefer_mp4      => 0,
-    prefer_av1      => 0,
-    maxResults      => 10,
-    hfr             => 1,           # true to prefer high frame rate (HFR) videos
-    resolution      => 'best',
-    videoDimension  => undef,
-    videoEmbeddable => undef,
-    videoLicense    => undef,
-    videoSyndicated => undef,
-    publishedBefore => undef,
-    publishedAfter  => undef,
-    hl              => 'en_US',
-    regionCode      => undef,
+    dash_support   => 1,
+    dash_mp4_audio => 1,
+    dash_segmented => 1,         # may load slow
+    prefer_mp4     => 0,
+    prefer_av1     => 0,
+    maxResults     => 10,
+    hfr            => 1,         # true to prefer high frame rate (HFR) videos
+    resolution     => 'best',
+    videoDimension => undef,
+    videoLicense   => undef,
+    hl             => 'en_US',
+    region         => undef,
 
     comments_width => 80,        # wrap comments longer than `n` characters
-    comments_order => 'top',    # valid values: time, relevance
+    comments_order => 'top',     # valid values: time, relevance
 
     # API
     api_host => "auto",
@@ -230,22 +226,22 @@ my %CONFIG = (
     audio_only  => 0,
 
     tooltips        => 1,
-    tooltip_max_len => 512,          # max length of description in tooltips
+    tooltip_max_len => 512,    # max length of description in tooltips
 
     thousand_separator     => q{,},
     downloads_dir          => curdir(),
     web_browser            => undef,                 # defaults to $ENV{WEBBROWSER} or xdg-open
     terminal               => undef,                 # autodetect it later
     terminal_exec          => q{-e '%s'},
-    straw_viewer         => undef,
-    straw_viewer_args    => [],
+    straw_viewer           => undef,
+    straw_viewer_args      => [],
     youtube_users_file     => $youtube_users_file,
     history                => 1,
     history_limit          => 100_000,
     history_file           => $history_file,
     recent_history         => 10,
     remember_session       => 1,
-    remember_session_depth   => 10,
+    remember_session_depth => 10,
     save_titles_to_history => 0,
     entry_completion_limit => 10,
 );
@@ -355,7 +351,6 @@ my %objects = (
     'channels_checkbox'      => \my $search_for_channels_checkbox,
     'spinbutton1'            => \my $spin_results,
     'spinbutton2'            => \my $spin_start_with_page,
-    'spinbutton3'            => \my $spin_published_within,
     'thumbs_checkbutton'     => \my $thumbs_checkbutton,
     'fullscreen_checkbutton' => \my $fullscreen_checkbutton,
     'clear_list_checkbutton' => \my $clear_list_checkbutton,
@@ -466,7 +461,7 @@ if (not defined $CONFIG{cache_dir}) {
     $CONFIG{cache_dir} = catdir($cache_dir, 'straw-viewer');
 }
 
-foreach my $path($CONFIG{cache_dir}) {
+foreach my $path ($CONFIG{cache_dir}) {
     next if -d $path;
     require File::Path;
     File::Path::make_path($path)
@@ -807,15 +802,15 @@ my %ResultsHistory = (
 $CONFIG{straw_viewer} //= which_command('straw-viewer') // 'straw-viewer';
 
 my $yv_obj = WWW::StrawViewer->new(
-                                     escape_utf8         => 1,
-                                     config_dir          => $config_dir,
-                                     hl                  => $CONFIG{hl},
-                                     env_proxy           => $CONFIG{env_proxy},
-                                     cache_dir           => $CONFIG{cache_dir},
-                                     cookie_file         => $CONFIG{cookie_file},
-                                     user_agent          => $CONFIG{user_agent},
-                                     timeout             => $CONFIG{timeout},
-                                );
+                                   escape_utf8 => 1,
+                                   config_dir  => $config_dir,
+                                   hl          => $CONFIG{hl},
+                                   env_proxy   => $CONFIG{env_proxy},
+                                   cache_dir   => $CONFIG{cache_dir},
+                                   cookie_file => $CONFIG{cookie_file},
+                                   user_agent  => $CONFIG{user_agent},
+                                   timeout     => $CONFIG{timeout},
+                                  );
 
 #$yv_obj->load_authentication_tokens();
 
@@ -865,9 +860,8 @@ sub apply_configuration {
                              api_host
                              videoSyndicated comments_order
                              maxResults videoDimension
-                             videoEmbeddable videoLicense
-                             publishedAfter publishedBefore
-                             regionCode videoCategoryId
+                             videoLicense
+                             region videoCategoryId
                              debug http_proxy user_agent
                              timeout cookie_file
                              )
@@ -1425,8 +1419,8 @@ $accel->connect(ord('g'), ['control-mask'], ['visible'], \&show_user_favorited_v
 $accel->connect(ord('m'), ['control-mask'], ['visible'], \&show_videos_from_selected_author);
 $accel->connect(ord('k'), ['control-mask'], ['visible'], \&show_playlists_from_selected_author);
 $accel->connect(ord('w'), ['control-mask'], ['visible'], \&show_warnings_window);
-$accel->connect(0xffff, ['lock-mask'], ['visible'], \&delete_selected_row);
-$accel->connect(0xffc8, ['lock-mask'], ['visible'], \&maximize_unmaximize_mainw);
+$accel->connect(0xffff,   ['lock-mask'],    ['visible'], \&delete_selected_row);
+$accel->connect(0xffc8,   ['lock-mask'],    ['visible'], \&maximize_unmaximize_mainw);
 $mainw->add_accel_group($accel);
 
 # Support for navigating back and forth using the side buttons of the mouse
@@ -1455,7 +1449,7 @@ $accel->connect(0xff1b, ['lock-mask'], ['visible'], \&hide_feeds_window);
 $feeds_window->add_accel_group($accel);
 
 $accel = Gtk3::AccelGroup->new;
-$accel->connect(0xff1b, ['lock-mask'], ['visible'], \&hide_preferences_window);
+$accel->connect(0xff1b,   ['lock-mask'],    ['visible'], \&hide_preferences_window);
 $accel->connect(ord('s'), ['control-mask'], ['visible'], \&save_configuration);
 $prefernces_window->add_accel_group($accel);
 
@@ -1699,25 +1693,10 @@ sub combobox_published_within_changed {
     my $period = $published_within_combobox->get_active_text;
 
     if ($period =~ /^any/) {
-        $spin_published_within->hide;
+        $yv_obj->set_date(undef);
     }
     else {
-        $spin_published_within->show;
-    }
-
-    spin_published_within_changed();
-}
-
-sub spin_published_within_changed {
-    my $period = $published_within_combobox->get_active_text;
-
-    if ($period =~ /^any/) {
-        $yv_obj->set_publishedAfter(undef);
-    }
-    else {
-        my $amount = $spin_published_within->get_value;
-        my $date   = $yv_utils->period_to_date($amount, $period);
-        $yv_obj->set_publishedAfter($date);
+        $yv_obj->set_date($period);
     }
 }
 
@@ -2029,8 +2008,8 @@ sub set_youtube_tops {
     }
 
     sub remove_selected_user {
-        my $selection = $users_treeview->get_selection // return;
-        my $iter      = $selection->get_selected       // return;
+        my $selection  = $users_treeview->get_selection // return;
+        my $iter       = $selection->get_selected       // return;
         my $channel_id = $users_liststore->get($iter, 0);
         delete $channels{$channel_id};
         $users_liststore->remove($iter);
@@ -2277,8 +2256,6 @@ sub search {
         append_to_history($keywords, 1);
     }
 
-    spin_published_within_changed();
-
     # Set the username
     my $username = $from_author_entry->get_text;
 
@@ -2512,7 +2489,8 @@ sub get_pixbuf_thumbnail_from_entry {
 sub display_results {
     my ($results, $from_history) = @_;
 
-    my $url   = $results->{url};
+    my $url = $results->{url};
+
     #my $info  = $results->{results} // {};
     my $items = $results->{results} // [];
 
@@ -2537,11 +2515,10 @@ sub display_results {
         my $current_instance = $yv_obj->get_api_host();
         $yv_obj->pick_and_set_random_instance();    # set a random invidious instance
 
-        die
-          "Probably $current_instance is down.\n"
-        . "\nTry changing the `api_host` in configuration file:\n\n"
-        . qq{\tapi_host => "auto",\n}
-        . qq{\nSee also: https://github.com/trizen/straw-viewer#invidious-instances\n};
+        die "Probably $current_instance is down.\n"
+          . "\nTry changing the `api_host` in configuration file:\n\n"
+          . qq{\tapi_host => "auto",\n}
+          . qq{\nSee also: https://github.com/trizen/straw-viewer#invidious-instances\n};
     }
 
     if (not $yv_utils->has_entries($results)) {
@@ -2554,68 +2531,68 @@ sub display_results {
 
     #~ if (not $from_history) {
 
-        #~ foreach my $entry (@$items) {
-            #~ if ($yv_utils->is_activity($entry)) {
-                #~ my $type = $entry->{snippet}{type};
+    #~ foreach my $entry (@$items) {
+    #~ if ($yv_utils->is_activity($entry)) {
+    #~ my $type = $entry->{snippet}{type};
 
-                #~ if ($type eq 'upload') {
-                    #~ $entry->{kind} = 'youtube#video';
-                    #~ $entry->{id}   = $entry->{contentDetails}{upload}{videoId};
-                #~ }
+    #~ if ($type eq 'upload') {
+    #~ $entry->{kind} = 'youtube#video';
+    #~ $entry->{id}   = $entry->{contentDetails}{upload}{videoId};
+    #~ }
 
-                #~ if ($type eq 'playlistItem') {
-                    #~ $entry->{kind} = 'youtube#video';
-                    #~ $entry->{id}   = $entry->{contentDetails}{playlistItem}{resourceId}{videoId};
-                #~ }
+    #~ if ($type eq 'playlistItem') {
+    #~ $entry->{kind} = 'youtube#video';
+    #~ $entry->{id}   = $entry->{contentDetails}{playlistItem}{resourceId}{videoId};
+    #~ }
 
-                #~ if ($type eq 'subscription') {
-                    #~ $entry->{kind}               = 'youtube#channel';
-                    #~ $entry->{snippet}{title}     = $entry->{snippet}{channelTitle};
-                    #~ $entry->{snippet}{channelId} = $entry->{contentDetails}{subscription}{resourceId}{channelId};
-                #~ }
+    #~ if ($type eq 'subscription') {
+    #~ $entry->{kind}               = 'youtube#channel';
+    #~ $entry->{snippet}{title}     = $entry->{snippet}{channelTitle};
+    #~ $entry->{snippet}{channelId} = $entry->{contentDetails}{subscription}{resourceId}{channelId};
+    #~ }
 
-                #~ if ($type eq 'bulletin' and $entry->{contentDetails}{bulletin}{resourceId}{kind} eq 'youtube#video') {
-                    #~ $entry->{kind} = 'youtube#video';
-                    #~ $entry->{id}   = $entry->{contentDetails}{bulletin}{resourceId}{videoId};
-                #~ }
-            #~ }
-        #~ }
+    #~ if ($type eq 'bulletin' and $entry->{contentDetails}{bulletin}{resourceId}{kind} eq 'youtube#video') {
+    #~ $entry->{kind} = 'youtube#video';
+    #~ $entry->{id}   = $entry->{contentDetails}{bulletin}{resourceId}{videoId};
+    #~ }
+    #~ }
+    #~ }
 
-        #~ my @video_ids;
-        #~ my @playlist_ids;
+    #~ my @video_ids;
+    #~ my @playlist_ids;
 
-        #~ foreach my $i (0 .. $#{$items}) {
-            #~ my $item = $items->[$i];
+    #~ foreach my $i (0 .. $#{$items}) {
+    #~ my $item = $items->[$i];
 
-            #~ if ($yv_utils->is_playlist($item)) {
-                #~ push @playlist_ids, $yv_utils->get_playlist_id($item);
-            #~ }
-            #~ elsif ($yv_utils->is_video($item)) {
-                #~ push @video_ids, $yv_utils->get_video_id($item);
-            #~ }
-        #~ }
+    #~ if ($yv_utils->is_playlist($item)) {
+    #~ push @playlist_ids, $yv_utils->get_playlist_id($item);
+    #~ }
+    #~ elsif ($yv_utils->is_video($item)) {
+    #~ push @video_ids, $yv_utils->get_video_id($item);
+    #~ }
+    #~ }
 
-        #~ my %id_lookup;
+    #~ my %id_lookup;
 
-        #~ if (@video_ids) {
-            #~ my $content_details = $yv_obj->video_details(join(',', @video_ids), VIDEO_PART);
-            #~ my $video_details   = $content_details->{results}{items};
+    #~ if (@video_ids) {
+    #~ my $content_details = $yv_obj->video_details(join(',', @video_ids), VIDEO_PART);
+    #~ my $video_details   = $content_details->{results}{items};
 
-            #~ foreach my $i (0 .. $#video_ids) {
-                #~ $id_lookup{$video_ids[$i]} = $video_details->[$i];
-            #~ }
-        #~ }
+    #~ foreach my $i (0 .. $#video_ids) {
+    #~ $id_lookup{$video_ids[$i]} = $video_details->[$i];
+    #~ }
+    #~ }
 
-        #~ if (@playlist_ids) {
-            #~ my $content_details  = $yv_obj->playlist_from_id(join(',', @playlist_ids), 'contentDetails');
-            #~ my $playlist_details = $content_details->{results}{items};
+    #~ if (@playlist_ids) {
+    #~ my $content_details  = $yv_obj->playlist_from_id(join(',', @playlist_ids), 'contentDetails');
+    #~ my $playlist_details = $content_details->{results}{items};
 
-            #~ foreach my $i (0 .. $#playlist_ids) {
-                #~ $id_lookup{$playlist_ids[$i]} = $playlist_details->[$i];
-            #~ }
-        #~ }
+    #~ foreach my $i (0 .. $#playlist_ids) {
+    #~ $id_lookup{$playlist_ids[$i]} = $playlist_details->[$i];
+    #~ }
+    #~ }
 
-        #~ $info->{__extra_info__} = \%id_lookup;
+    #~ $info->{__extra_info__} = \%id_lookup;
     #~ }
 
     foreach my $i (0 .. $#{$items}) {
@@ -2626,8 +2603,8 @@ sub display_results {
             #~ my $playlist_id = $yv_utils->get_playlist_id($item) || next;
 
             #~ if (exists($info->{__extra_info__}{$playlist_id})) {
-                #~ @{$item}{qw(contentDetails)} =
-                  #~ @{$info->{__extra_info__}{$playlist_id}}{qw(contentDetails)};
+            #~ @{$item}{qw(contentDetails)} =
+            #~ @{$info->{__extra_info__}{$playlist_id}}{qw(contentDetails)};
             #~ }
 
             add_playlist_entry($item);
@@ -2643,8 +2620,8 @@ sub display_results {
             #~ my $video_id = $yv_utils->get_video_id($item) || next;
 
             #~ if (exists($info->{__extra_info__}{$video_id})) {
-                #~ @{$item}{qw(id contentDetails statistics snippet)} =
-                  #~ @{$info->{__extra_info__}{$video_id}}{qw(id contentDetails statistics snippet)};
+            #~ @{$item}{qw(id contentDetails statistics snippet)} =
+            #~ @{$info->{__extra_info__}{$video_id}}{qw(id contentDetails statistics snippet)};
             #~ }
 
             # Filter out private or deleted videos
@@ -2667,7 +2644,7 @@ sub display_results {
 
     if (ref($results->{results}) eq 'HASH' and exists($results->{results}{continuation})) {
         if (defined $results->{results}{continuation}) {
-             append_next_page($url, $results->{results}{continuation});
+            append_next_page($url, $results->{results}{continuation});
         }
     }
     else {
@@ -3016,12 +2993,12 @@ sub get_streaming_url {
     if (ref($captions) eq 'ARRAY' and @$captions and $CONFIG{get_captions}) {
         require WWW::StrawViewer::GetCaption;
         my $yv_cap = WWW::StrawViewer::GetCaption->new(
-                                                         auto_captions => $CONFIG{auto_captions},
-                                                         captions_dir  => $CONFIG{cache_dir},
-                                                         captions      => $captions,
-                                                         languages     => $CONFIG{srt_languages},
-                                                         yv_obj        => $yv_obj,
-                                                        );
+                                                       auto_captions => $CONFIG{auto_captions},
+                                                       captions_dir  => $CONFIG{cache_dir},
+                                                       captions      => $captions,
+                                                       languages     => $CONFIG{srt_languages},
+                                                       yv_obj        => $yv_obj,
+                                                      );
         $srt_file = $yv_cap->save_caption($video_id);
     }
 
@@ -3204,10 +3181,10 @@ sub get_options_as_arguments {
                    'no-interactive'   => q{},
                    'resolution'       => $CONFIG{resolution},
                    'download-dir'     => quotemeta(rel2abs($CONFIG{downloads_dir})),
-                   'fullscreen'       => $CONFIG{fullscreen} ? q{} : undef,
+                   'fullscreen'       => $CONFIG{fullscreen}   ? q{}   : undef,
                    'no-dash'          => $CONFIG{dash_support} ? undef : q{},
-                   'no-video'         => $CONFIG{audio_only} ? q{} : undef,
-                   'resolution=audio' => $CONFIG{audio_only} ? q{} : undef,
+                   'no-video'         => $CONFIG{audio_only}   ? q{}   : undef,
+                   'resolution=audio' => $CONFIG{audio_only}   ? q{}   : undef,
                   );
 
     while (my ($argv, $value) = each %options) {
@@ -3311,7 +3288,7 @@ sub execute_cli_straw_viewer {
                                $CONFIG{terminal_exec},
                                join(q{ },
                                     $CONFIG{straw_viewer}, get_options_as_arguments(),
-                                    @arguments,              @{$CONFIG{straw_viewer_args}}),
+                                    @arguments,            @{$CONFIG{straw_viewer_args}}),
                               )
                       );
     my $code = execute_external_program($command);
@@ -3410,9 +3387,9 @@ sub display_comments {
 
     return 1 if ref($results) ne 'HASH';
 
-    my $url      = $results->{url};
-    my $video_id = $results->{results}{videoId};
-    my $comments = $results->{results}{comments} // [];
+    my $url          = $results->{url};
+    my $video_id     = $results->{results}{videoId};
+    my $comments     = $results->{results}{comments} // [];
     my $continuation = $results->{results}{continuation};
 
     foreach my $comment (@{$comments}) {
@@ -3421,7 +3398,7 @@ sub display_comments {
         #pp $comment;
 
         #my $comment_age = $yv_utils->date_to_age($snippet->{publishedAt});
-        my $comment_id = $yv_utils->get_comment_id($comment);
+        my $comment_id  = $yv_utils->get_comment_id($comment);
         my $comment_age = $yv_utils->get_publication_age_approx($comment);
 
         my $comment_text = reflow_text(
@@ -3435,12 +3412,12 @@ sub display_comments {
                                            )
                                          . ") commented:</big>\n"
                                          . encode_entities(
-                                                           wrap_text(
-                                                                     i_tab => "\t",
-                                                                     s_tab => "\t",
-                                                                     text  => [$yv_utils->get_comment_content($comment) // 'Empty comment...'],
-                                                                    )
-                                                          )
+                                                  wrap_text(
+                                                      i_tab => "\t",
+                                                      s_tab => "\t",
+                                                      text => [$yv_utils->get_comment_content($comment) // 'Empty comment...'],
+                                                  )
+                                         )
                                       );
 
         my $iter = $feeds_liststore->append;
@@ -3452,39 +3429,39 @@ sub display_comments {
                              );
 
         #~ if (exists $comment->{replies}) {
-            #~ foreach my $reply (reverse @{$comment->{replies}{comments}}) {
-                #~ my $reply_age = $yv_utils->date_to_age($reply->{snippet}{publishedAt});
-                #~ my $reply_text = reflow_text(
-                                                 #~ "\t<big><b>"
-                                               #~ . encode_entities($reply->{snippet}{authorDisplayName})
-                                               #~ . "</b> ("
-                                               #~ . (
-                                                  #~ $reply_age =~ /sec|min|hour|day/
-                                                  #~ ? "$reply_age ago"
-                                                  #~ : $yv_utils->format_date($reply->{snippet}{publishedAt})
-                                                 #~ )
-                                               #~ . ") replied:</big>\n"
-                                               #~ . encode_entities(
-                                                             #~ wrap_text(
-                                                                 #~ i_tab => "\t\t",
-                                                                 #~ s_tab => "\t\t",
-                                                                 #~ text => [$reply->{snippet}{textDisplay} // 'Empty comment...']
-                                                             #~ )
-                                               #~ )
-                                            #~ );
+        #~ foreach my $reply (reverse @{$comment->{replies}{comments}}) {
+        #~ my $reply_age = $yv_utils->date_to_age($reply->{snippet}{publishedAt});
+        #~ my $reply_text = reflow_text(
+        #~ "\t<big><b>"
+        #~ . encode_entities($reply->{snippet}{authorDisplayName})
+        #~ . "</b> ("
+        #~ . (
+        #~ $reply_age =~ /sec|min|hour|day/
+        #~ ? "$reply_age ago"
+        #~ : $yv_utils->format_date($reply->{snippet}{publishedAt})
+        #~ )
+        #~ . ") replied:</big>\n"
+        #~ . encode_entities(
+        #~ wrap_text(
+        #~ i_tab => "\t\t",
+        #~ s_tab => "\t\t",
+        #~ text => [$reply->{snippet}{textDisplay} // 'Empty comment...']
+        #~ )
+        #~ )
+        #~ );
 
-                #~ my $iter = $feeds_liststore->append;
-                #~ $feeds_liststore->set(
-                                      #~ $iter,
-                                      #~ 0 => $reply_text,
-                                      #~ 3 => $reply->{snippet}{videoId},
-                                      #~ 4 => $reply->{id},
-                                     #~ );
-            #~ }
+        #~ my $iter = $feeds_liststore->append;
+        #~ $feeds_liststore->set(
+        #~ $iter,
+        #~ 0 => $reply_text,
+        #~ 3 => $reply->{snippet}{videoId},
+        #~ 4 => $reply->{id},
+        #~ );
+        #~ }
         #~ }
     }
 
-     if (defined $continuation) {
+    if (defined $continuation) {
         my $iter = $feeds_liststore->append;
         $feeds_liststore->set(
                               $iter,
@@ -3617,10 +3594,10 @@ sub set_entry_details {
     my $info = $yv_obj->parse_json_string($liststore->get($iter, 8));
 
     my %thumbs = (
-        start => 1,
-        middle => 2,
-        end => 3,
-    );
+                  start  => 1,
+                  middle => 2,
+                  end    => 3,
+                 );
 
     # Getting thumbs
     foreach my $type (keys %thumbs) {
@@ -3633,18 +3610,18 @@ sub set_entry_details {
 
                 my $url = $yv_utils->get_thumbnail_url($info, $type);
 
-                    #~ my $thumbnail = $info->{snippet}{thumbnails}{medium};
-                    #~ my $url       = $thumbnail->{url};
+                #~ my $thumbnail = $info->{snippet}{thumbnails}{medium};
+                #~ my $url       = $thumbnail->{url};
 
-                    if ($url =~ /_live\.\w+\z/) {
-                        ## no extra thumbnails available while video is LIVE
-                    }
-                    else {
-                        $url =~ s{/\w+\.(\w+)\z}{/mq$thumbs{$type}.$1};
-                    }
+                if ($url =~ /_live\.\w+\z/) {
+                    ## no extra thumbnails available while video is LIVE
+                }
+                else {
+                    $url =~ s{/\w+\.(\w+)\z}{/mq$thumbs{$type}.$1};
+                }
 
-                    my $pixbuf = get_pixbuf_thumbnail_from_url($url, 160, 90);
-                    $gui->get_object("image$thumbs{$type}")->set_from_pixbuf($pixbuf);
+                my $pixbuf = get_pixbuf_thumbnail_from_url($url, 160, 90);
+                $gui->get_object("image$thumbs{$type}")->set_from_pixbuf($pixbuf);
 
                 return 0;
             },

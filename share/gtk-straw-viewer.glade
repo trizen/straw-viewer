@@ -983,11 +983,9 @@ Author: Trizen https://github.com/trizen
                                                             <property name="active">0</property>
                                                             <items>
                                                             <item translatable="yes">relevance</item>
-                                                            <item translatable="yes">title</item>
                                                             <item translatable="yes">rating</item>
-                                                            <item translatable="yes">date</item>
-                                                            <item translatable="yes">videoCount</item>
-                                                            <item translatable="yes">viewCount</item>
+                                                            <item translatable="yes">upload_date</item>
+                                                            <item translatable="yes">view_count</item>
                                                             </items>
                                                             <signal name="changed" handler="combobox_order_changed" swapped="no"/>
                                                           </object>
@@ -1038,7 +1036,6 @@ long – longer than 20 minutes</property>
                                                         <items>
                                                           <item translatable="yes">any</item>
                                                           <item translatable="yes">short</item>
-                                                          <item translatable="yes">medium</item>
                                                           <item translatable="yes">long</item>
                                                         </items>
                                                         <signal name="changed" handler="combobox_duration_changed" swapped="no"/>
@@ -1079,8 +1076,7 @@ long – longer than 20 minutes</property>
                                                         <property name="active">0</property>
                                                         <items>
                                                           <item translatable="yes">any</item>
-                                                          <item translatable="yes">closedCaption</item>
-                                                          <item translatable="yes">none</item>
+                                                          <item translatable="yes">true</item>
                                                         </items>
                                                         <signal name="changed" handler="combobox_caption_changed" swapped="no"/>
                                                       </object>
@@ -1121,7 +1117,6 @@ long – longer than 20 minutes</property>
                                                         <items>
                                                           <item translatable="yes">any</item>
                                                           <item translatable="yes">high</item>
-                                                          <item translatable="yes">standard</item>
                                                         </items>
                                                         <signal name="changed" handler="combobox_definition_changed" swapped="no"/>
                                                       </object>
@@ -1302,36 +1297,16 @@ Recommended: 10</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
                                                             <child>
-                                                            <object class="GtkSpinButton" id="spinbutton3">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="invisible_char">•</property>
-                                                            <property name="caps_lock_warning">False</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
-                                                            <property name="adjustment">adjustment3</property>
-                                                            <property name="climb_rate">1</property>
-                                                            <property name="numeric">True</property>
-                                                            <property name="update_policy">if-valid</property>
-                                                            <signal name="activate" handler="search" swapped="no"/>
-                                                            <signal name="value-changed" handler="spin_published_within_changed" swapped="no"/>
-                                                            </object>
-                                                            <packing>
-                                                            <property name="expand">True</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">0</property>
-                                                            </packing>
-                                                            </child>
-                                                            <child>
                                                             <object class="GtkComboBoxText" id="comboboxtext1">
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">False</property>
                                                             <items>
                                                             <item translatable="yes">anytime</item>
-                                                            <item translatable="yes">days</item>
-                                                            <item translatable="yes">weeks</item>
-                                                            <item translatable="yes">months</item>
-                                                            <item translatable="yes">years</item>
+                                                            <item translatable="yes">hour</item>
+                                                            <item translatable="yes">today</item>
+                                                            <item translatable="yes">week</item>
+                                                            <item translatable="yes">month</item>
+                                                            <item translatable="yes">year</item>
                                                             </items>
                                                             <signal name="changed" handler="combobox_published_within_changed" swapped="no"/>
                                                             </object>

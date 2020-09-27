@@ -167,16 +167,16 @@ sub related_to_videoID {
 
         my $viewCount = 0;
 
-        if ($info->{viewCountText}{simpleText} =~ /^([\d,]+) views/) {
+        if (($info->{viewCountText}{simpleText} // '') =~ /^([\d,]+) views/) {
             $viewCount = ($1 =~ tr/,//dr);
         }
-        elsif ($info->{viewCountText}{simpleText} =~ /Recommended for you/i) {
+        elsif (($info->{viewCountText}{simpleText} // '') =~ /Recommended for you/i) {
             next;    # filter out recommended videos from related videos
         }
 
         my $lengthSeconds = 0;
 
-        if ($info->{lengthText}{simpleText} =~ /([\d:]+)/) {
+        if (($info->{lengthText}{simpleText} // '') =~ /([\d:]+)/) {
             my $time   = $1;
             my @fields = split(/:/, $time);
 

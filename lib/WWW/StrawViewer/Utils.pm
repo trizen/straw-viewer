@@ -501,6 +501,10 @@ sub get_description {
     $desc = HTML::Entities::decode_entities($desc);
     $desc =~ s/^\s+//;
 
+    if (not $desc =~ /\S/) {
+        $desc = $info->{description} // '';
+    }
+
     ($desc =~ /\S/) ? $desc : 'No description available...';
 }
 

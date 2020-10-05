@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 18 September 2020
+#  Edit: 05 October 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -224,6 +224,10 @@ my %CONFIG = (
     debug       => 0,
     fullscreen  => 0,
     audio_only  => 0,
+
+    # youtube-dl support
+    ytdl     => 1,
+    ytdl_cmd => undef,    # auto-detect
 
     tooltips        => 1,
     tooltip_max_len => 512,    # max length of description in tooltips
@@ -736,6 +740,16 @@ foreach my $path ($CONFIG{cache_dir}) {
     }
 }
 
+# Locate youtube-dl
+if (not defined $CONFIG{ytdl_cmd}) {
+    if (defined(my $path = which_command('youtube-dl'))) {
+        $CONFIG{ytdl_cmd} = $path;
+    }
+    else {
+        $CONFIG{ytdl_cmd} = 'youtube-dl';
+    }
+}
+
 # Locate video player
 if (not $CONFIG{video_player_selected}) {
 
@@ -804,6 +818,8 @@ $CONFIG{straw_viewer} //= which_command('straw-viewer') // 'straw-viewer';
 my $yv_obj = WWW::StrawViewer->new(
                                    escape_utf8 => 1,
                                    config_dir  => $config_dir,
+                                   ytdl        => $CONFIG{ytdl},
+                                   ytdl_cmd    => $CONFIG{ytdl_cmd},
                                    hl          => $CONFIG{hl},
                                    env_proxy   => $CONFIG{env_proxy},
                                    cache_dir   => $CONFIG{cache_dir},
@@ -863,7 +879,7 @@ sub apply_configuration {
                              videoLicense
                              region videoCategoryId
                              debug http_proxy user_agent
-                             timeout cookie_file
+                             timeout cookie_file ytdl ytdl_cmd
                              )
       ) {
 
@@ -3072,7 +3088,7 @@ sub get_player_command {
                                  );
 
     if ($streaming->{streaming}{url} =~ m{^https://www\.youtube\.com/watch\?v=}) {
-        $cmd =~ s{ --no-ytdl\b}{ }g;
+        $cmd =~ s{\s*--no-ytdl\b}{ }g;
     }
 
     $has_video ? $cmd : join(' ', $cmd, quotemeta($streaming->{streaming}{url}));

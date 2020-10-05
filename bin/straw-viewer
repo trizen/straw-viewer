@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  straw-viewer
 #  Fork: 14 February 2020
-#  Edit: 18 September 2020
+#  Edit: 05 October 2020
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -250,6 +250,10 @@ my %CONFIG = (
     convert_cmd          => 'ffmpeg -i *IN* *OUT*',
     convert_to           => undef,
 
+    # youtube-dl support
+    ytdl     => 1,
+    ytdl_cmd => undef,                                # auto-defined
+
     custom_layout => undef,                           # auto-defined
     custom_layout_format => [{width => 3,     align => "right", color => "bold",      text => "*NO*.",},
                              {width => "55%", align => "left",  color => "bold blue", text => "*TITLE*",},
@@ -461,6 +465,21 @@ sub load_config {
         }
     }
 
+    # Locate youtube-dl
+    if (not defined($CONFIG{ytdl_cmd})) {
+
+        my $ytdl_path = which_command('youtube-dl');
+
+        if (defined($ytdl_path)) {
+            $CONFIG{ytdl_cmd} = $ytdl_path;
+        }
+        else {
+            $CONFIG{ytdl_cmd} = 'youtube-dl';
+        }
+
+        $update_config = 1;
+    }
+
     # Download with wget if it is installed
     if (not defined $CONFIG{download_with_wget}) {
 
@@ -600,6 +619,8 @@ if ($opt{history}) {
 my $yv_obj = WWW::StrawViewer->new(
                                    escape_utf8 => 1,
                                    config_dir  => $config_dir,
+                                   ytdl        => $opt{ytdl},
+                                   ytdl_cmd    => $opt{ytdl_cmd},
                                    cache_dir   => $opt{cache_dir},
                                    env_proxy   => $opt{env_proxy},
                                    cookie_file => $opt{cookie_file},
@@ -801,7 +822,9 @@ usage: $execname [options] ([url] | [keywords])
    --dash!              : include or exclude the DASH itags
    --dash-mp4a!         : include or exclude the itags for MP4 audio streams
    --dash-segmented!    : include or exclude segmented DASH streams
-
+   --ytdl!              : use youtube-dl for videos with encrypted signatures
+                          `--no-ytdl` will use invidious instances
+   --ytdl-cmd=s         : youtube-dl command (default: youtube-dl)
 
 Help options:
    -T  --tricks         : show more 'hidden' features of $execname
@@ -1086,7 +1109,7 @@ sub apply_configuration {
                              channelId region debug hl
                              http_proxy page comments_order
                              subscriptions_order user_agent
-                             cookie_file timeout
+                             cookie_file timeout ytdl ytdl_cmd
                              )
       ) {
 
@@ -1593,6 +1616,9 @@ sub parse_arguments {
         'more|m!'                            => \$opt{more_results},
         'pos|position=i'                     => \$opt{position},
         'ps|playlist-save=s'                 => \$opt{playlist_save},
+
+        'ytdl!'      => \$opt{ytdl},
+        'ytdl-cmd=s' => \$opt{ytdl_cmd},
 
         'quiet|q!'      => \$opt{quiet},
         'really-quiet!' => \$opt{really_quiet},
@@ -3359,7 +3385,7 @@ sub get_player_command {
                                  );
 
     if ($streaming->{streaming}{url} =~ m{^https://www\.youtube\.com/watch\?v=}) {
-        $cmd =~ s{ --no-ytdl\b}{ }g;
+        $cmd =~ s{\s*--no-ytdl\b}{ }g;
     }
 
     $has_video ? $cmd : join(' ', $cmd, quotemeta($streaming->{streaming}{url}));

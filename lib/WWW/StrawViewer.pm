@@ -54,25 +54,15 @@ my %valid_options = (
     order      => {valid => [qw(relevance rating upload_date view_count)], default => undef},
     date       => {valid => [qw(hour today week month year)],              default => undef},
 
-    channelId   => {valid => qr/^[-\w]{2,}\z/, default => undef},
-    channelType => {valid => [qw(any show)],   default => undef},
+    channelId => {valid => qr/^[-\w]{2,}\z/, default => undef},
 
     # Video only options
-    videoCaption    => {valid => [qw(1 true)],                  default => undef},
-    videoDefinition => {valid => [qw(high standard)],           default => undef},
-    videoCategoryId => {valid => qr/^\d+\z/,                    default => undef},
-    videoDimension  => {valid => [qw(2d 3d)],                   default => undef},
-    videoDuration   => {valid => [qw(short long)],              default => undef},
-    videoEmbeddable => {valid => [qw(true)],                    default => undef},
-    videoLicense    => {valid => [qw(creative_commons)],        default => undef},
-    videoSyndicated => {valid => [qw(true)],                    default => undef},
-    eventType       => {valid => [qw(completed live upcoming)], default => undef},
-    chart           => {valid => [qw(mostPopular)],             default => 'mostPopular'},
-
-    region            => {valid => qr/^[A-Z]{2}\z/i,           default => undef},
-    relevanceLanguage => {valid => qr/^[a-z]+(?:\-\w+)?\z/i,   default => undef},
-    safeSearch        => {valid => [qw(none moderate strict)], default => undef},
-    videoType         => {valid => [qw(episode movie)],        default => undef},
+    videoCaption    => {valid => [qw(1 true)],           default => undef},
+    videoDefinition => {valid => [qw(high standard)],    default => undef},
+    videoDimension  => {valid => [qw(2d 3d)],            default => undef},
+    videoDuration   => {valid => [qw(short long)],       default => undef},
+    videoLicense    => {valid => [qw(creative_commons)], default => undef},
+    region          => {valid => qr/^[A-Z]{2}\z/i,       default => undef},
 
     comments_order      => {valid => [qw(top new)],                       default => 'top'},
     subscriptions_order => {valid => [qw(alphabetical relevance unread)], default => undef},
@@ -233,23 +223,9 @@ sub new {
 
 sub page_token {
     my ($self) = @_;
-
     my $page = $self->get_page;
-
-    # Don't generate the token for the first page
-    return undef if $page == 1;
-
-    my $index = $page * $self->get_maxResults() - $self->get_maxResults();
-    my $k     = int($index / 128) - 1;
-    $index -= 128 * $k;
-
-    my @f = (8, $index);
-    if ($k > 0 or $index > 127) {
-        push @f, $k + 1;
-    }
-
-    require MIME::Base64;
-    MIME::Base64::encode_base64(pack('C*', @f, 16, 0)) =~ tr/=\n//dr;
+    return undef if ($page == 1);
+    return $page;
 }
 
 =head2 escape_string($string)

@@ -29,7 +29,7 @@ use warnings;
 no warnings 'once';
 
 my $DEVEL;                                 # true in devel mode
-use if ($DEVEL = 0), lib => qw(../lib);    # devel only
+use if ($DEVEL = 1), lib => qw(../lib);    # devel only
 
 use WWW::StrawViewer v0.0.9;
 use WWW::StrawViewer::RegularExpressions;
@@ -140,7 +140,6 @@ my %CONFIG = (
 
     # Combobox values
     active_resolution_combobox          => 0,
-    active_safeSearch_combobox          => 1,
     active_more_options_expander        => 0,
     active_panel_account_combobox       => 0,
     active_channel_type_combobox        => 0,
@@ -342,7 +341,6 @@ my %objects = (
     'comboboxtext8'          => \my $duration_combobox,
     'comboboxtext3'          => \my $caption_combobox,
     'comboboxtext4'          => \my $definition_combobox,
-    'comboboxtext5'          => \my $safesearch_combobox,
     'comboboxtext1'          => \my $published_within_combobox,
     'comboboxtext13'         => \my $subscriptions_order_combobox,
     'panel_user_entry'       => \my $panel_user_entry,
@@ -866,7 +864,7 @@ sub apply_configuration {
 
     foreach my $option_name (
                              qw(
-                             videoSyndicated comments_order
+                             comments_order
                              maxResults videoDimension videoLicense
                              region debug http_proxy user_agent
                              timeout cookie_file ytdl ytdl_cmd
@@ -893,9 +891,6 @@ sub apply_configuration {
 
     # Set the "More options" expander
     $more_options_expander->set_expanded($CONFIG{active_more_options_expander});
-
-    # Combo boxes setting config value
-    $safesearch_combobox->set_active($CONFIG{active_safeSearch_combobox});
 
     my %resolution = (
                       'best' => 0,
@@ -1648,11 +1643,6 @@ sub combobox_resolution_changed {
     $CONFIG{active_resolution_combobox} = $resolution_combobox->get_active;
     my $res = $resolution_combobox->get_active_text;
     $CONFIG{resolution} = $res =~ /^(\d+)p\z/ ? $1 : $res;
-}
-
-sub combobox_safesearch_changed {
-    $CONFIG{active_safeSearch_combobox} = $safesearch_combobox->get_active;
-    $yv_obj->set_safeSearch($safesearch_combobox->get_active_text);
 }
 
 sub combobox_duration_changed {

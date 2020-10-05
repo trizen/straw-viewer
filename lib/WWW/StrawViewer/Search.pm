@@ -50,11 +50,11 @@ sub _make_search_url {
     return $self->_make_feed_url(
         'search',
 
-        region    => $self->get_region,
-        sort_by   => $self->get_order,
-        date      => $self->get_date,
-        pageToken => $self->page_token,
-        duration  => $self->get_videoDuration,
+        region   => $self->get_region,
+        sort_by  => $self->get_order,
+        date     => $self->get_date,
+        page     => $self->page_token,
+        duration => $self->get_videoDuration,
 
         (@features ? (features => join(',', @features)) : ()),
 

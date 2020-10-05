@@ -28,24 +28,10 @@
 
 straw-viewer - YouTube from command line.
 
-See: straw-viewer --help
+     straw-viewer --help
      straw-viewer --tricks
      straw-viewer --examples
      straw-viewer --stdin-help
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2010-2020 Trizen.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-See L<https://dev.perl.org/licenses/> for more information.
 
 =cut
 
@@ -56,7 +42,7 @@ use warnings;
 no warnings 'once';
 
 my $DEVEL;                                 # true in devel mode
-use if ($DEVEL = 0), lib => qw(../lib);    # devel mode
+use if ($DEVEL = 1), lib => qw(../lib);    # devel mode
 
 use WWW::StrawViewer v0.0.9;
 use WWW::StrawViewer::RegularExpressions;
@@ -185,7 +171,6 @@ my %CONFIG = (
     videoDefinition => undef,
     videoDimension  => undef,
     videoLicense    => undef,
-    safeSearch      => undef,
     videoCaption    => undef,
     videoDuration   => undef,
 
@@ -684,7 +669,7 @@ usage: $execname [options] ([url] | [keywords])
 
 * Trending
    --trending:s       : show trending videos in a given category
-                        valid categories: music gaming news movies
+                        valid categories: music gaming news movies popular
 
  * Channels
    -sc --channels     : search for YouTube channels
@@ -699,15 +684,14 @@ usage: $execname [options] ([url] | [keywords])
    --duration=s         : filter search results based on video length
                           valid values: short long
    --captions!          : only videos with or without closed captions
-   --category=s         : search only for videos in a specific category name/ID
-   --safe-search=s      : YouTube will skip restricted videos for your location
-                          valid values are: none moderate strict
    --order=s            : order the results using a specific sorting method
                           valid values: relevance rating upload_date view_count
    --date=s             : short videos published in a time period
                           valid values: hour today week month year
    --hd!                : search only for videos available in at least 720p
-   --vd=s               : set the video definition (any, high or standard)
+   --vd=s               : set the video definition (any or high)
+   --dimension=s        : set video dimension (any or 3d)
+   --license=s          : set video license (any or creative_commons)
    --page=i             : get results starting with a specific page number
    --results=i          : how many results to display per page (max: 50)
    --hfr!               : prefer high frame rate (HFR) videos
@@ -818,7 +802,7 @@ usage: $execname [options] ([url] | [keywords])
    --cookies=s          : file to read cookies from and dump cookie
    --user-agent=s       : specify a custom user agent
    --proxy=s            : set HTTP(S)/SOCKS proxy: 'proto://domain.tld:port/'
-                          If authentication required,
+                          If authentication is required,
                           use 'proto://user:pass\@domain.tld:port/'
    --dash!              : include or exclude the DASH itags
    --dash-mp4a!         : include or exclude the itags for MP4 audio streams
@@ -1102,11 +1086,10 @@ sub apply_configuration {
     # ... YOUTUBE OPTIONS ... #
     foreach my $option_name (
                              qw(
-                             api_host
-                             videoCaption
-                             videoDefinition
+                             videoCaption videoDefinition
                              videoDimension videoDuration
-                             date order
+                             videoLicense
+                             api_host date order
                              channelId region debug
                              http_proxy page comments_order
                              subscriptions_order user_agent
@@ -1513,7 +1496,8 @@ sub parse_arguments {
         'play-playlists|pp=s'      => \$opt{play_playlists},
         'debug:1'                  => \$opt{debug},
         'download|dl|d!'           => \$opt{download_video},
-        'safe-search|safeSearch=s' => \$opt{safeSearch},
+        'dimension=s'              => \$opt{videoDimension},
+        'license=s'                => \$opt{videoLicense},
         'vd|video-definition=s'    => \$opt{videoDefinition},
         'hd|high-definition!'      => \$opt{hd},
         'I|interactive!'           => \$opt{interactive},
@@ -4143,3 +4127,400 @@ sub main_quit {
 }
 
 main_quit(0);
+
+=head1 CONFIGURATION OPTIONS
+
+=head2 api_host
+
+Hostname of an invidious instance. When set to C<"auto">, a random invidious is selected everytime when the program is started.
+
+=head2 auto_captions
+
+When set to C<1>, auto-generated captions will be retrieved. By default, auto-generated captions are ignored.
+
+=head2 autoplay_mode
+
+Enable autoplay mode, which will continuously play related videos.
+
+=head2 cache_dir
+
+Cache directory where to save temporary files.
+
+=head2 colors
+
+Use colors for text.
+
+=head2 comments_order
+
+The sorting order for comments. Valid values: "top", "new".
+
+=head2 confirm
+
+Display a confirmation message after each video played.
+
+=head2 convert_cmd
+
+Command to convert videos.
+
+Default value:
+
+    "ffmpeg -i *IN* *OUT*"
+
+B<*IN*> gets replaced with the input file.
+
+B<*OUT*> gets replaced with the output file.
+
+=head2 convert_to
+
+Format to convert each downloaded video into. (e.g.: C<"mp3">).
+
+=head2 cookie_file
+
+Load cookies from a file. Useful to overcome the "429: Too Many Requests" issue.
+
+The file must be a C<# Netscape HTTP Cookie File>. Same format as C<youtube-dl> requires.
+
+See also:
+
+    https://github.com/ytdl-org/youtube-dl#how-do-i-pass-cookies-to-youtube-dl
+
+=head2 copy_caption
+
+When downloading a video, copy the closed-caption (if any) in the same folder with the video.
+
+If C<merge_into_mkv> and C<merge_with_captions> are both enabled, there is no need to enable this option.
+
+=head2 custom_layout
+
+Use a custom layout for video results, defined in C<custom_layout_format>.
+
+=head2 custom_layout_format
+
+An array of hash values specifying a custom layout for video results.
+
+    align       # "left" or "right"
+    color       # any color supported by Term::ANSIColor
+    text        # the actual text
+    width       # width allocated for the text
+
+The value for C<width> can be either a number of characters (e.g.: 20) or can be a percentage of the terminal width (e.g.: "15%").
+
+=head2 dash_mp4_audio
+
+Include or exclude MP4/M4A (AAC) audio files.
+
+=head2 dash_segmented
+
+Include or exclude streams in "Dynamic Adaptive Streaming over HTTP" (DASH) format.
+
+See also:
+
+    https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP
+
+=head2 dash_support
+
+Enable or disable support for split videos.
+
+=head2 date
+
+Search for videos uploaded within a specific amount of time.
+
+Valid values: "hour", "today", "week", "month", "year".
+
+=head2 debug
+
+Enable debug/verbose mode, which will print some extra information.
+
+Valid values: 0, 1, 2, 3.
+
+=head2 download_and_play
+
+Play downloaded videos.
+
+=head2 download_with_wget
+
+Download videos with C<wget>.
+
+=head2 downloads_dir
+
+Directory where to download files and where to save converted files.
+
+=head2 env_proxy
+
+Load proxy settings from C<*_proxy> environment variables (if any).
+
+=head2 fat32safe
+
+When downloading a video, make the filename compatible with the FAT32 filesystem.
+
+=head2 ffmpeg_cmd
+
+Path to the C<ffmpeg> program.
+
+=head2 fullscreen
+
+Play videos in fullscreen mode.
+
+=head2 get_captions
+
+Downlaod closed-captions for videos (if any).
+
+=head2 get_term_width
+
+Read the terminal width (`stty size`).
+
+=head2 hfr
+
+Include or exclude High Frame Rate (HFR) videos.
+
+=head2 highlight_color
+
+Highlight color used to highlight watched videos.
+
+Any color supported by L<Term::ANSIColor> can be used.
+
+=head2 highlight_watched
+
+Highlight watched videos.
+
+=head2 history
+
+Enable or disable support for input history.
+
+Requires L<Term::ReadLine::Gnu>.
+
+=head2 history_file
+
+File where to save the input history.
+
+=head2 history_limit
+
+Maximum number of entries in the history file.
+
+When the limit is reached, the first half of the history file will be deleted.
+
+Set the value to C<-1> for no limit.
+
+=head2 http_proxy
+
+Set HTTP(S)/SOCKS proxy, using the format:
+
+    proto://domain.tld:port/
+
+If authentication is required, use:
+
+    proto://user:pass@domain.tld:port/
+
+=head2 ignore_av1
+
+Ignore videos in AV1 format.
+
+Recommended to be enabled on slow/old hardware.
+
+=head2 interactive
+
+Interactive mode, prompting for user-input.
+
+=head2 keep_original_video
+
+Keep the original video after conversion. When set to C<0>, the original video will be deleted.
+
+=head2 maxResults
+
+How many results to display per page.
+
+Currently, this is not implemented.
+
+=head2 merge_into_mkv
+
+During download, merge the audio+video files into an MKV container.
+
+Requires C<ffmpeg>.
+
+=head2 merge_into_mkv_args
+
+Arguments for C<ffmpeg> how to merge the files.
+
+=head2 merge_with_captions
+
+Include closed-captions inside the MKV container (if any).
+
+=head2 order
+
+Search order for videos.
+
+Valid values: "relevance", "rating", "upload_date", "view_count".
+
+=head2 page
+
+Page number of results.
+
+=head2 prefer_av1
+
+Prefer videos in AV1 format. (just for testing)
+
+=head2 prefer_mp4
+
+Prefer videos in MP4 (AVC) format.
+
+=head2 region
+
+ISO 3166 country code (default: "US").
+
+=head2 remember_watched
+
+Set to C<1> to remember and highlight watched videos across multiple sessions.
+
+The video IDs are saved in the filename specified by C<watched_file>.
+
+=head2 remove_played_file
+
+When C<download_and_play> is enabled, remove the file after playing it.
+
+=head2 resolution
+
+Preferred resolution for videos (if available).
+
+Valid values: best, 2160p, 1440p, 1080p, 720p, 480p, 360p, 240p, 144p, audio.
+
+=head2 results_fixed_width
+
+Results in fixed-width format.
+
+Requires: L<Unicode::GCString> or L<Text::CharWidth>.
+
+=head2 results_with_colors
+
+Results with colors.
+
+=head2 results_with_details
+
+Results with extra details.
+
+=head2 show_video_info
+
+Show extra-video info when selected.
+
+=head2 skip_if_exists
+
+When downloading, skip if the file already exists locally.
+
+=head2 skip_watched
+
+Skip already watched/downloaded videos.
+
+=head2 srt_languages
+
+List of SRT languges in the order of preference.
+
+=head2 subscriptions_order
+
+Order of subscriptions. Currently, not implemented.
+
+=head2 thousand_separator
+
+Thousands seperator character for numbers >= 1000.
+
+=head2 timeout
+
+HTTPS timeout value in seconds. The default value is 10 seconds.
+
+=head2 user_agent
+
+Token that is used to identify the user agent on the network. The agent value is sent as the C<User-Agent> header in the requests.
+
+=head2 video_filename_format
+
+The format of filename for downloaded files.
+
+The available special tokens are listed in:
+
+    straw-viewer --tricks
+
+=head2 video_player_selected
+
+The selected video player defined the C<video_players> table.
+
+=head2 video_players
+
+A table of video players.
+
+The keys for each player are:
+
+    arg        # any arguments for the video player
+    audio      # option specifying the *AUDIO* file
+    cmd        # the main player command
+    fs         # the fullscreen option
+    novideo    # the no-video mode option
+    srt        # option specifying the *SUB* file
+
+=head2 videoCaption
+
+When set to C<1> or C<"true">, retrieve only the videos that contain closed-captions in search results.
+
+=head2 videoDefinition
+
+When set to C<"high">, retrieve only HD videos in search results.
+
+=head2 videoDimension
+
+When set to C<"3d">, retrieve only 3D videos in search results.
+
+=head2 videoDuration
+
+Retrieve only videos of short or long videos in search results.
+
+Valid values: "any", "short", "long".
+
+=head2 videoLicense
+
+When set to C<"creative_commons">, retrieve only videos under the I<Creative Commons> license in search results.
+
+=head2 watched_file
+
+File where to save the video IDs of watched/downloaded videos when C<remember_watched> is set to a true value.
+
+=head2 wget_cmd
+
+Command for C<wget> when C<download_with_wget> is set to a true value.
+
+=head2 youtube_video_url
+
+Sprintf format for an YouTube video URL, given the video ID.
+
+=head2 ytdl
+
+Use C<youtube-dl> for videos with encrypted signatures.
+
+When set to C<0>, invidious instances will be used instead.
+
+=head2 ytdl_cmd
+
+Command for C<youtube-dl> when C<ytdl> is set to a true value.
+
+=head1 CONFIGURATION FILES
+
+The configuration files are:
+
+    ~/.config/straw-viewer/straw-viewer.conf
+    ~/.config/straw-viewer/gtk-straw-viewer.conf
+
+=head1 REPOSITORY
+
+https://github.com/trizen/straw-viewer
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2020 Trizen.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See L<https://dev.perl.org/licenses/> for more information.
+
+=cut

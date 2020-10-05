@@ -7,6 +7,7 @@ use warnings;
 use Memoize;
 
 memoize('_get_video_info');
+memoize('_ytdl_is_available');
 memoize('_extract_from_ytdl');
 memoize('_extract_from_invidious');
 

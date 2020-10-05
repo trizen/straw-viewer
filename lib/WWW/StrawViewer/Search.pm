@@ -53,7 +53,6 @@ sub _make_search_url {
         region    => $self->get_region,
         sort_by   => $self->get_order,
         date      => $self->get_date,
-        channelId => $self->get_channelId,
         pageToken => $self->page_token,
         duration  => $self->get_videoDuration,
 
@@ -72,15 +71,28 @@ Search for a list of types (comma-separated).
 sub search_for {
     my ($self, $type, $keywords, $args) = @_;
 
+    if (ref($args) ne 'HASH') {
+        $args = {};
+    }
+
     $keywords //= [];
-    if (ref $keywords ne 'ARRAY') {
+
+    if (ref($keywords) ne 'ARRAY') {
         $keywords = [split ' ', $keywords];
+    }
+
+    $keywords = $self->escape_string(join(' ', @{$keywords}));
+
+    # Search in a channel's videos
+    if (defined(my $channel_id = $self->get_channelId)) {
+        my $url = $self->_make_feed_url("channels/search/$channel_id", q => $keywords,);
+        return $self->_get_results($url);
     }
 
     my $url = $self->_make_search_url(
                                       type => $type,
-                                      q    => $self->escape_string(join(' ', @{$keywords})),
-                                      (ref $args eq 'HASH' ? %{$args} : (part => 'snippet')),
+                                      q    => $keywords,
+                                      %$args,
                                      );
 
     return $self->_get_results($url);
@@ -104,7 +116,7 @@ sub search_for {
                       },
                       {
                        name => 'all',
-                       type => 'video,channel,playlist',
+                       type => 'all',
                       }
       ) {
         *{__PACKAGE__ . '::' . "search_$pair->{name}"} = sub {

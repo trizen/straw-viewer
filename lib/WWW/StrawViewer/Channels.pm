@@ -33,6 +33,17 @@ sub videos_from_username {
     return $self->_get_results($self->_make_feed_url("channels/$channel_id/videos"));
 }
 
+=head2 popular_videos($channel_id)
+
+Get the most popular videos for a given channel ID.
+
+=cut
+
+sub popular_videos {
+    my ($self, $channel_id) = @_;
+    return $self->_get_results($self->_make_feed_url("channels/$channel_id/videos", sort_by => 'popular'));
+}
+
 =head2 channels_from_categoryID($category_id)
 
 Return the YouTube channels associated with the specified category.
@@ -131,15 +142,13 @@ Return the channel ID for an username.
 sub channel_id_from_username {
     my ($self, $username) = @_;
 
-    state $username_lookup = {};
-
-    if (exists $username_lookup->{$username}) {
-        return $username_lookup->{$username};
+    # A channel's username (if it doesn't include spaces) is also valid in place of ucid.
+    if ($username =~ /\w/ and not $username =~ /\s/) {
+        return $username;
     }
 
-    $username_lookup->{$username} = undef;
-    my $channel = $self->channels_from_username($username) // return;
-    $username_lookup->{$username} = $channel->{results}{items}[0]{id} // return;
+    # TODO: resolve channel name to channel ID
+    return $username;
 }
 
 =head2 channel_title_from_id($channel_id)

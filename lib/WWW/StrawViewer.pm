@@ -469,6 +469,9 @@ sub lwp_get {
         return $self->lwp_get($url, %opt, depth => $opt{depth} + 1);
     }
 
+    # Too many errors. Pick another invidious instance.
+    $self->pick_and_set_random_instance();
+
     _warn_reponse_error($response, $url);
     return;
 }
@@ -681,6 +684,7 @@ sub default_arguments {
 
 sub _make_feed_url {
     my ($self, $path, %args) = @_;
+
     my $extra_args = $self->default_arguments(%args);
     my $url        = $self->get_api_url . $path;
 

@@ -81,24 +81,6 @@ sub trending_videos_from_category {
     return $results;
 }
 
-=head2 popular_videos($channel_id)
-
-Get the most popular videos for a given channel ID.
-
-=cut
-
-sub popular_videos {
-    my ($self, $id) = @_;
-
-    my $results = do {
-        local $self->{channelId} = $id;
-        local $self->{order}     = 'viewCount';
-        $self->search_videos("");
-    };
-
-    return $results;
-}
-
 =head2 my_likes()
 
 Get the videos liked by the authenticated user.

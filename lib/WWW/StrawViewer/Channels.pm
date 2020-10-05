@@ -41,6 +41,11 @@ Get the most popular videos for a given channel ID.
 
 sub popular_videos {
     my ($self, $channel_id) = @_;
+
+    if (not defined($channel_id)) {    # trending popular videos
+        return $self->_get_results($self->_make_feed_url('popular'));
+    }
+
     return $self->_get_results($self->_make_feed_url("channels/$channel_id/videos", sort_by => 'popular'));
 }
 

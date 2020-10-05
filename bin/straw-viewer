@@ -195,7 +195,6 @@ my %CONFIG = (
     comments_order      => 'top',          # valid values: top, new
     subscriptions_order => 'relevance',    # valid values: alphabetical, relevance, unread
 
-    hl     => 'en_US',
     region => undef,
 
     # URI options
@@ -659,7 +658,6 @@ usage: $execname [options] ([url] | [keywords])
 
  * Categories
    -c  --categories     : display the available YouTube categories
-   -hl --catlang=s      : language for categories (default: en_US)
 
  * Region
    --region=s           : set the region code (default: US)
@@ -685,7 +683,8 @@ usage: $execname [options] ([url] | [keywords])
    -ua --activities:s : show activity events for a given channel
 
 * Trending
-   --trending:s       : show trending videos in a given category ID or name
+   --trending:s       : show trending videos in a given category
+                        valid categories: music gaming news movies
 
  * Channels
    -sc --channels     : search for YouTube channels
@@ -1108,7 +1107,7 @@ sub apply_configuration {
                              videoDefinition
                              videoDimension videoDuration
                              date order
-                             channelId region debug hl
+                             channelId region debug
                              http_proxy page comments_order
                              subscriptions_order user_agent
                              cookie_file timeout ytdl ytdl_cmd
@@ -1124,20 +1123,6 @@ sub apply_configuration {
             if (not defined($set_value) or $set_value ne $value) {
                 warn "\n[!] Invalid value <$value> for option <$option_name>\n";
             }
-        }
-    }
-
-    if (defined $opt->{category_id}) {
-
-        my $str      = delete $opt->{category_id};
-        my $category = extract_category($str);
-
-        if (ref($category) eq 'HASH') {
-            say ":: Category selected: $category->{snippet}{title}" if $yv_obj->get_debug;
-            $yv_obj->set_videoCategoryId($category->{id});
-        }
-        else {
-            warn_invalid('category', $str);
         }
     }
 
@@ -1304,19 +1289,7 @@ sub apply_configuration {
     }
 
     if (defined $opt->{trending}) {
-
-        my $str      = delete $opt->{trending};
-        my $category = extract_category($str);
-        my $cat_id   = undef;
-
-        if (ref($category) eq 'HASH') {
-            say ":: Category selected: $category->{snippet}{title}" if $yv_obj->get_debug;
-            $cat_id = $category->{id};
-        }
-        elsif ($str) {
-            warn_invalid('category', $str);
-        }
-
+        my $cat_id = delete $opt->{trending};
         print_videos($yv_obj->trending_videos_from_category($cat_id));
     }
 
@@ -1517,8 +1490,6 @@ sub parse_arguments {
         'user-agent|agent=s'             => \$opt{user_agent},
         'http-proxy|https-proxy|proxy=s' => \$opt{http_proxy},
 
-        'catlang|cl|hl=s'        => \$opt{hl},
-        'category|cat-id|cat=s'  => \$opt{category_id},
         'r|region|region-code=s' => \$opt{region},
 
         'order|order-by|sort|sort-by=s' => \$opt{order},
@@ -1711,34 +1682,6 @@ sub get_valid_playlist_id {
     }
 
     return $id;
-}
-
-sub extract_category {
-    my ($str) = @_;
-
-    $str || return;
-
-    state $results = $yv_obj->video_categories;
-    return if ref($results) ne 'HASH';
-
-    my $categories = $results->{items};
-    return if ref($categories) ne 'ARRAY';
-
-    foreach my $category (@$categories) {
-        if ($category->{id} eq $str) {
-            return $category;
-        }
-    }
-
-    my $str_re = qr/\Q$str\E/i;
-
-    foreach my $category (@$categories) {
-        if ($yv_utils->get_title($category) =~ /$str_re/) {
-            return $category;
-        }
-    }
-
-    return;
 }
 
 sub extract_channel_id {
@@ -2446,10 +2389,9 @@ sub valid_num {
 sub adjust_width {
     my ($str, $len, $prepend) = @_;
 
-    $len > 0 or do {
-        warn "[WARN] Insufficient space for the title: increase your terminal width!\n";
+    if ($len <= 0) {
         return $str;
-    };
+    }
 
     state $pkg = (
         eval {
@@ -2747,18 +2689,14 @@ sub print_comments {
 sub print_categories {
     my ($results) = @_;
 
-    return if ref($results) ne 'HASH';
-    my $categories = $results->{items};
+    my $categories = $results;
     return if ref($categories) ne 'ARRAY';
 
     my $i = 0;
     print "\n" if @{$categories};
 
-    # Filter out nonassignable categories
-    @$categories = grep { $_->{snippet}{assignable} } @$categories;
-
     foreach my $category (@{$categories}) {
-        printf "%s. %-40s (id: %s)\n", colored(sprintf('%2d', ++$i), 'bold'), $yv_utils->get_title($category), $category->{id};
+        printf "%s. %-40s\n", colored(sprintf('%2d', ++$i), 'bold'), $category->{title};
     }
 
     my @keywords = get_input_for_categories();
@@ -2794,11 +2732,7 @@ sub print_categories {
         elsif (valid_num($key, $categories)) {
             my $category = $categories->[$key - 1];
             my $cat_id   = $category->{id};
-            my $videos   = $yv_obj->videos_from_category($cat_id);
-
-            if (not $yv_utils->has_entries($videos)) {
-                $videos = $yv_obj->trending_videos_from_category($cat_id);
-            }
+            my $videos   = $yv_obj->trending_videos_from_category($cat_id);
 
             print_videos($videos);
         }

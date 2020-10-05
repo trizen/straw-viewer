@@ -50,7 +50,6 @@ my %valid_options = (
     v          => {valid => q[],                                           default => 3},
     page       => {valid => qr/^(?!0+\z)\d+\z/,                            default => 1},
     http_proxy => {valid => qr/./,                                         default => undef},
-    hl         => {valid => qr/^\w+(?:[\-_]\w+)?\z/,                       default => undef},
     maxResults => {valid => [1 .. 50],                                     default => 10},
     order      => {valid => [qw(relevance rating upload_date view_count)], default => undef},
     date       => {valid => [qw(hour today week month year)],              default => undef},
@@ -283,7 +282,7 @@ sub set_lwp_useragent {
           // do { require LWP::UserAgent; 'LWP::UserAgent' }
     );
 
-    $self->{lwp} = $lwp->new(
+    my $agent = $lwp->new(
 
         cookie_jar    => {},                      # temporary cookies
         timeout       => $self->get_timeout,
@@ -329,7 +328,6 @@ sub set_lwp_useragent {
         HTTP::Message::decodable();
     };
 
-    my $agent = $self->{lwp};
     $agent->ssl_opts(Timeout => $self->get_timeout);
     $agent->default_header('Accept-Encoding' => $accepted_encodings);
     $agent->conn_cache($cache);
@@ -366,8 +364,9 @@ sub set_lwp_useragent {
         $agent->cookie_jar($cookies);
     }
 
-    push @{$self->{lwp}->requests_redirectable}, 'POST';
-    return $self->{lwp};
+    push @{$agent->requests_redirectable}, 'POST';
+    $self->{lwp} = $agent;
+    return $agent;
 }
 
 =head2 prepare_access_token()
@@ -399,7 +398,7 @@ sub _auth_lwp_header {
 
 sub _warn_reponse_error {
     my ($resp, $url) = @_;
-    warn sprintf("[%s] Error occurred on URL: %s\n", $resp->status_line, $url =~ s/([&?])key=(.*?)&/${1}key=[...]&/r);
+    warn sprintf("[%s] Error occurred on URL: %s\n", $resp->status_line, $url);
 }
 
 =head2 lwp_get($url, %opt)
@@ -463,7 +462,7 @@ sub lwp_get {
     $opt{depth} ||= 0;
 
     # Try again on 500+ HTTP errors
-    if (    $opt{depth} <= 3
+    if (    $opt{depth} < 3
         and $response->code() >= 500
         and $response->status_line() =~ /(?:Temporary|Server) Error|Timeout|Service Unavailable/i) {
         return $self->lwp_get($url, %opt, depth => $opt{depth} + 1);
@@ -581,7 +580,7 @@ sub select_good_invidious_instances {
 
     my %ignored = (
                    'yewtu.be'                 => 1,
-                   'invidiou.site'            => 0,
+                   'invidiou.site'            => 1,
                    'invidious.xyz'            => 1,
                    'vid.mint.lgbt'            => 1,
                    'invidious.ggc-project.de' => 1,
@@ -704,7 +703,6 @@ sub _extract_from_invidious {
         require List::Util;
         @instances = List::Util::shuffle(map { $_->[0] } @instances);
         push @instances, 'invidious.snopyta.org';
-        push @instances, 'invidious.13ad.de';
     }
     else {
         @instances = qw(
@@ -712,7 +710,6 @@ sub _extract_from_invidious {
           invidious.site
           invidious.fdn.fr
           invidious.snopyta.org
-          invidious.13ad.de
           );
     }
 
@@ -1239,6 +1236,8 @@ sub previous_page {
 
             local $ENV{HTTP_PROXY}  = $self->{lwp}->proxy('http');
             local $ENV{HTTPS_PROXY} = $self->{lwp}->proxy('https');
+
+            local $" = " ";
 
                 $name eq 'exec'   ? exec(@args)
               : $name eq 'system' ? system(@args)

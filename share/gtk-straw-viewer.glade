@@ -887,59 +887,37 @@ Author: Trizen https://github.com/trizen
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
                                             <child>
-                                              <object class="GtkExpander" id="expander2">
+                                              <object class="GtkFrame" id="frame14">
                                                 <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="label_xalign">0</property>
+                                                <property name="shadow_type">none</property>
                                                 <child>
                                                   <object class="GtkAlignment" id="alignment11">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="left_padding">12</property>
                                                     <child>
-                                                      <object class="GtkBox" id="vbox22">
+                                                      <object class="GtkBox" id="vbox9">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">False</property>
                                                         <property name="orientation">vertical</property>
                                                         <child>
-                                                          <object class="GtkCheckButton" id="channels_checkbox">
-                                                            <property name="label" translatable="yes">Channels</property>
+                                                          <object class="GtkComboBoxText" id="comboboxtext10">
                                                             <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">False</property>
-                                                            <property name="draw_indicator">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="active">0</property>
+                                                            <items>
+                                                            <item translatable="yes">video</item>
+                                                            <item translatable="yes">playlist</item>
+                                                            <item translatable="yes">channel</item>
+                                                            <item translatable="yes">all</item>
+                                                            </items>
                                                           </object>
                                                           <packing>
-                                                            <property name="expand">True</property>
-                                                            <property name="fill">True</property>
+                                                            <property name="expand">False</property>
+                                                            <property name="fill">False</property>
                                                             <property name="position">0</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkCheckButton" id="playlists_checkbox">
-                                                            <property name="label" translatable="yes">Playlists</property>
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">False</property>
-                                                            <property name="draw_indicator">True</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">True</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">1</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkCheckButton" id="videos_checkbox">
-                                                            <property name="label" translatable="yes">Videos</property>
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="receives_default">False</property>
-                                                            <property name="draw_indicator">True</property>
-                                                          </object>
-                                                          <packing>
-                                                            <property name="expand">True</property>
-                                                            <property name="fill">True</property>
-                                                            <property name="position">2</property>
                                                           </packing>
                                                         </child>
                                                       </object>
@@ -950,7 +928,8 @@ Author: Trizen https://github.com/trizen
                                                   <object class="GtkLabel" id="label6">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
-                                                    <property name="label" translatable="yes">Search for:</property>
+                                                    <property name="label" translatable="yes">&lt;b&gt;Type:&lt;/b&gt;</property>
+                                                    <property name="use_markup">True</property>
                                                   </object>
                                                 </child>
                                               </object>
@@ -1377,48 +1356,6 @@ Unless the author name is valid, this field is ignored.</property>
                                                         <property name="expand">False</property>
                                                         <property name="fill">False</property>
                                                         <property name="position">3</property>
-                                                      </packing>
-                                                    </child>
-                                                    <child>
-                                                      <object class="GtkFrame" id="frame25">
-                                                        <property name="visible">True</property>
-                                                        <property name="can_focus">False</property>
-                                                        <property name="label_xalign">0</property>
-                                                        <property name="shadow_type">none</property>
-                                                        <child>
-                                                          <object class="GtkAlignment" id="alignment24">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="left_padding">12</property>
-                                                            <child>
-                                                            <object class="GtkEntry" id="category_id_entry">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">True</property>
-                                                            <property name="tooltip_text" translatable="yes">Search in videos uploaded in a specific category.
-Unless the categoryID is valid, this field is ignored.</property>
-                                                            <property name="invisible_char">•</property>
-                                                            <property name="text" translatable="yes">Insert a valid category ID...</property>
-                                                            <property name="primary_icon_activatable">False</property>
-                                                            <property name="secondary_icon_activatable">False</property>
-                                                            <signal name="activate" handler="search" swapped="no"/>
-                                                            <signal name="button-press-event" handler="clear_text" swapped="no"/>
-                                                            </object>
-                                                            </child>
-                                                          </object>
-                                                        </child>
-                                                        <child type="label">
-                                                          <object class="GtkLabel" id="label33">
-                                                            <property name="visible">True</property>
-                                                            <property name="can_focus">False</property>
-                                                            <property name="label" translatable="yes">&lt;b&gt;CategoryID:&lt;/b&gt;</property>
-                                                            <property name="use_markup">True</property>
-                                                          </object>
-                                                        </child>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">True</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">4</property>
                                                       </packing>
                                                     </child>
                                                     <child>

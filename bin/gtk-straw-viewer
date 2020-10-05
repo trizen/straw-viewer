@@ -185,20 +185,19 @@ my %CONFIG = (
     # Straw options
     dash_support   => 1,
     dash_mp4_audio => 1,
-    dash_segmented => 1,         # may load slow
+    dash_segmented => 1,        # may load slow
     prefer_mp4     => 0,
     prefer_av1     => 0,
     ignore_av1     => 0,
     maxResults     => 10,
-    hfr            => 1,         # true to prefer high frame rate (HFR) videos
+    hfr            => 1,        # true to prefer high frame rate (HFR) videos
     resolution     => 'best',
     videoDimension => undef,
     videoLicense   => undef,
-    hl             => 'en_US',
     region         => undef,
 
-    comments_width => 80,        # wrap comments longer than `n` characters
-    comments_order => 'top',     # valid values: time, relevance
+    comments_width => 80,       # wrap comments longer than `n` characters
+    comments_order => 'top',    # valid values: time, relevance
 
     # API
     api_host => "auto",
@@ -337,7 +336,6 @@ my %objects = (
     'treeviewcolumn2'        => \my $thumbs_column,
     'textview2'              => \my $textview_help,
     'from_author_entry'      => \my $from_author_entry,
-    'category_id_entry'      => \my $category_id_entry,
     'more_options_expander'  => \my $more_options_expander,
     'notebook1'              => \my $notebook,
     'comboboxtext9'          => \my $resolution_combobox,
@@ -351,9 +349,7 @@ my %objects = (
     'comboboxtext6'          => \my $panel_account_type_combobox,
     'comboboxtext2'          => \my $order_combobox,
     'comboboxtext7'          => \my $channel_type_combobox,
-    'videos_checkbox'        => \my $search_for_videos_checkbox,
-    'playlists_checkbox'     => \my $search_for_playlists_checkbox,
-    'channels_checkbox'      => \my $search_for_channels_checkbox,
+    'comboboxtext10'         => \my $search_for_combobox,
     'spinbutton1'            => \my $spin_results,
     'spinbutton2'            => \my $spin_start_with_page,
     'thumbs_checkbutton'     => \my $thumbs_checkbutton,
@@ -821,7 +817,6 @@ my $yv_obj = WWW::StrawViewer->new(
                                    config_dir  => $config_dir,
                                    ytdl        => $CONFIG{ytdl},
                                    ytdl_cmd    => $CONFIG{ytdl_cmd},
-                                   hl          => $CONFIG{hl},
                                    env_proxy   => $CONFIG{env_proxy},
                                    cache_dir   => $CONFIG{cache_dir},
                                    cookie_file => $CONFIG{cookie_file},
@@ -851,9 +846,6 @@ $order_combobox->set_active(0);
 # Spin button start with page
 $spin_start_with_page->set_value(1);
 
-# Set search for videos
-$search_for_videos_checkbox->set_active(1);
-
 sub apply_configuration {
 
     # Fullscreen mode
@@ -874,14 +866,11 @@ sub apply_configuration {
 
     foreach my $option_name (
                              qw(
-                             api_host
                              videoSyndicated comments_order
-                             maxResults videoDimension
-                             videoLicense
-                             region videoCategoryId
-                             debug http_proxy user_agent
+                             maxResults videoDimension videoLicense
+                             region debug http_proxy user_agent
                              timeout cookie_file ytdl ytdl_cmd
-                             prefer_mp4 prefer_av1
+                             api_host prefer_mp4 prefer_av1
                              )
       ) {
 
@@ -1702,6 +1691,7 @@ sub combobox_definition_changed {
 }
 
 sub combobox_published_within_changed {
+
     my $period = $published_within_combobox->get_active_text;
 
     if ($period =~ /^any/) {
@@ -1780,17 +1770,15 @@ sub add_category_header {
 sub append_categories {
     my ($categories, $type) = @_;
 
-    foreach my $category (@{$categories->{items}}) {
+    foreach my $category (@$categories) {
 
-        # Ignore nonassignable categories
-        $category->{snippet}{assignable} || next;
-
-        my $label = $yv_utils->get_title($category);
+        my $label = $category->{title};
         my $id    = $category->{id};
 
         $label =~ s{&}{&amp;}g;
 
         my $iter = $cats_liststore->append;
+
         $cats_liststore->set(
                              $iter,
                              0 => $label,
@@ -1802,33 +1790,7 @@ sub append_categories {
     return 1;
 }
 
-#<<<
-#~ {
-    # Standard categories:
-    #~ add_category_header("Categories");
-
-    #~ my $cats = $yv_obj->video_categories();
-    #~ if (ref($cats) eq 'HASH' and ref($cats->{items}) eq 'ARRAY') {
-
-        #~ my $help_text = '';
-        #~ foreach my $cat (sort { $a->{id} <=> $b->{id} } @{$cats->{items}}) {
-            #~ $cat->{snippet}{assignable} || next;
-            #~ $help_text .= sprintf("%2d - %s\n", $cat->{id}, $yv_utils->get_title($cat));
-        #~ }
-
-        #~ # Set tooltip text for "CategoryID" entry
-        #~ chomp($help_text);
-        #~ $category_id_entry->set_tooltip_text($help_text);
-
-        #~ # Append the categories to the "Categories" tab
-        #~ append_categories($cats, 'cat');
-    #~ }
-
-    # EDU categories:
-    #add_category_header("EDU Categories");
-    #append_categories($yv_obj->get_educategories(), 'edu-cat');
-#~ }
-#>>>
+append_categories($yv_obj->video_categories, 'cat');
 
 my $tops_liststore = $gui->get_object('liststore6');
 my $tops_treeview  = $gui->get_object('treeview4');
@@ -2284,29 +2246,7 @@ sub search {
         $yv_obj->set_channelId();
     }
 
-    # Set the category ID
-    my $category_id = $category_id_entry->get_text;
-    if ($category_id =~ /^\d+\z/) {
-        $yv_obj->set_videoCategoryId($category_id);
-    }
-    else {
-        $yv_obj->set_videoCategoryId();
-    }
-
-    my @types;
-    if ($search_for_playlists_checkbox->get_active) {
-        push @types, 'playlist';
-    }
-
-    if ($search_for_channels_checkbox->get_active) {
-        push @types, 'channel';
-    }
-
-    if ($search_for_videos_checkbox->get_active) {
-        push @types, 'video';
-    }
-
-    my $type = @types ? join(',', @types) : 'video';
+    my $type = $search_for_combobox->get_active_text;
     display_results($yv_obj->search_for($type, $keywords));
 
     return 1;
@@ -3126,18 +3066,12 @@ sub play_video {
 }
 
 sub list_category {
+
     my $iter   = $cat_treeview->get_selection->get_selected;
-    my $cat_id = $cats_liststore->get($iter, 1) // return;
+    my $cat_id = $cats_liststore->get($iter, 1);
     my $type   = $cats_liststore->get($iter, 3);
 
-    my $videos =
-        $type eq 'edu-cat'
-      ? $yv_obj->get_video_lectures_from_category($cat_id)
-      : $yv_obj->videos_from_category($cat_id);
-
-    if (not $yv_utils->has_entries($videos)) {
-        $videos = $yv_obj->trending_videos_from_category($cat_id);
-    }
+    my $videos = $yv_obj->trending_videos_from_category($cat_id);
 
     if ($yv_utils->has_entries($videos)) {
         $liststore->clear if $CONFIG{clear_search_list};
@@ -3149,6 +3083,7 @@ sub list_category {
 }
 
 sub list_tops {
+
     my $iter = $tops_treeview->get_selection->get_selected;
 
     my %top_opts;

@@ -25,7 +25,7 @@ sub _make_guideCategories_url {
         $opts{region} //= $self->get_region;
     }
 
-    $self->_make_feed_url('guideCategories', hl => $self->get_hl, %opts);
+    $self->_make_feed_url('guideCategories', %opts);
 }
 
 =head2 guide_categories(;$region_id)

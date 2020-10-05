@@ -48,22 +48,6 @@ sub _make_videos_url {
     }
 }
 
-=head2 videos_from_category($category_id)
-
-Get videos from a category ID.
-
-=cut
-
-sub videos_from_category {
-    my ($self, $cat_id) = @_;
-    $self->_get_results(
-                        $self->_make_videos_url(
-                                                chart           => $self->get_chart,
-                                                videoCategoryId => $cat_id,
-                                               )
-                       );
-}
-
 =head2 trending_videos_from_category($category_id)
 
 Get popular videos from a category ID.
@@ -71,14 +55,17 @@ Get popular videos from a category ID.
 =cut
 
 sub trending_videos_from_category {
-    my ($self, $cat_id) = @_;
+    my ($self, $category) = @_;
 
-    my $results = do {
-        local $self->{videoCategoryId} = $cat_id;
-        $self->search_videos("");
-    };
+    if (defined($category) and $category eq 'popular') {
+        return $self->popular_videos;
+    }
 
-    return $results;
+    if (defined($category) and $category eq 'trending') {
+        $category = undef;
+    }
+
+    return $self->_get_results($self->_make_feed_url('trending', (defined($category) ? (type => $category) : ())));
 }
 
 =head2 my_likes()

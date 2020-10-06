@@ -5,6 +5,18 @@
 
 [CHANGELOG]
 
+Version 0.1.0
+
+- Added the "ignore_av1" config-option.
+- Implemented `sort_by` and `date` parameters for `/search`.
+- Implemented the `--hd`, `--captions` and `--region=s` options.
+- Implemented support for popular videos.
+- Implemented support for searching for videos from a specific channel.
+- Implemented support for trending categories.
+- Support for changing the youtube-dl command.
+- Support for disabling the use of youtube-dl.
+- Documented the configuration options in `man straw-viewer`.
+
 Version 0.0.9
 
 - Support for loading cookies from a file.

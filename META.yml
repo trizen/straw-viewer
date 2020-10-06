@@ -16,7 +16,7 @@ name: WWW-StrawViewer
 provides:
   WWW::StrawViewer:
     file: lib/WWW/StrawViewer.pm
-    version: v0.0.9
+    version: v0.1.0
   WWW::StrawViewer::Activities:
     file: lib/WWW/StrawViewer/Activities.pm
   WWW::StrawViewer::Authentication:
@@ -78,5 +78,5 @@ requires:
   perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: v0.0.9
+version: v0.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -650,7 +650,7 @@ usage: $execname [options] ([url] | [keywords])
  * Videos
    -uv --uploads=s      : list videos uploaded by a specific channel or user
    -pv --popular=s      : list the most popular videos from a specific channel
-   -uf --favorites=s    : list the videos favorited by a specific user
+   -uf --favorites=s    : list the favorite videos of a specific user
    -id --videoids=s,s   : play YouTube videos by their IDs
    -rv --related=s      : show related videos for a video ID or URL
    -sv --search-videos  : search for YouTube videos (default mode)
@@ -2041,7 +2041,7 @@ sub get_and_play_video_ids {
             ## OK
         }
         else {
-            $info->{title}         = "unknwon";
+            $info->{title}         = "unknown";
             $info->{lengthSeconds} = 0;
             $info->{videoId}       = $id;
             warn_cant_do('get info for', $id);
@@ -4205,6 +4205,10 @@ An array of hash values specifying a custom layout for video results.
 
 The value for C<width> can be either a number of characters (e.g.: 20) or can be a percentage of the terminal width (e.g.: "15%").
 
+The special tokens for C<text> are listed in:
+
+    straw-viewer --tricks
+
 =head2 dash_mp4_audio
 
 Include or exclude MP4/M4A (AAC) audio files.
@@ -4263,7 +4267,7 @@ Play videos in fullscreen mode.
 
 =head2 get_captions
 
-Downlaod closed-captions for videos (if any).
+Download closed-captions for videos (if any).
 
 =head2 get_term_width
 
@@ -4411,7 +4415,7 @@ Skip already watched/downloaded videos.
 
 =head2 srt_languages
 
-List of SRT languges in the order of preference.
+List of SRT languages in the order of preference.
 
 =head2 subscriptions_order
 
@@ -4419,7 +4423,7 @@ Order of subscriptions. Currently, not implemented.
 
 =head2 thousand_separator
 
-Thousands seperator character for numbers >= 1000.
+Thousands separator character for numbers >= 1000.
 
 =head2 timeout
 
@@ -4486,7 +4490,7 @@ Command for C<wget> when C<download_with_wget> is set to a true value.
 
 =head2 youtube_video_url
 
-Sprintf format for an YouTube video URL, given the video ID.
+Sprintf() format for an YouTube video URL, given the video ID.
 
 =head2 ytdl
 

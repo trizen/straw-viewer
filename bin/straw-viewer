@@ -24,6 +24,8 @@
 # This is a fork of youtube-viewer:
 #   https://github.com/trizen/youtube-viewer
 
+=encoding utf8
+
 =head1 NAME
 
 straw-viewer - YouTube from command line.
@@ -4194,6 +4196,8 @@ If C<merge_into_mkv> and C<merge_with_captions> are both enabled, there is no ne
 
 Use a custom layout for video results, defined in C<custom_layout_format>.
 
+Requires: L<Unicode::GCString> or L<Text::CharWidth>.
+
 =head2 custom_layout_format
 
 An array of hash values specifying a custom layout for video results.
@@ -4216,10 +4220,6 @@ Include or exclude MP4/M4A (AAC) audio files.
 =head2 dash_segmented
 
 Include or exclude streams in "Dynamic Adaptive Streaming over HTTP" (DASH) format.
-
-See also:
-
-    https://en.wikipedia.org/wiki/Dynamic_Adaptive_Streaming_over_HTTP
 
 =head2 dash_support
 
@@ -4319,8 +4319,6 @@ If authentication is required, use:
 
 Ignore videos in AV1 format.
 
-Recommended to be enabled on slow/old hardware.
-
 =head2 interactive
 
 Interactive mode, prompting for user-input.
@@ -4403,7 +4401,7 @@ Results with extra details.
 
 =head2 show_video_info
 
-Show extra-video info when selected.
+Show extra info for videos when selected.
 
 =head2 skip_if_exists
 
@@ -4472,7 +4470,7 @@ When set to C<"3d">, retrieve only 3D videos in search results.
 
 =head2 videoDuration
 
-Retrieve only videos of short or long videos in search results.
+Retrieve only short or long videos in search results.
 
 Valid values: "any", "short", "long".
 
@@ -4508,6 +4506,10 @@ The configuration files are:
 
     ~/.config/straw-viewer/straw-viewer.conf
     ~/.config/straw-viewer/gtk-straw-viewer.conf
+
+=head1 INVIDIOUS API REFERENCE
+
+https://github.com/iv-org/invidious/wiki/API
 
 =head1 REPOSITORY
 

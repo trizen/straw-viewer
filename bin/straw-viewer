@@ -152,7 +152,7 @@ my %CONFIG = (
                               srt     => q{--sub-file=*SUB*},
                               audio   => q{--audio-file=*AUDIO*},
                               fs      => q{--fullscreen},
-                              arg     => q{--really-quiet --title=*TITLE* --no-ytdl},
+                              arg     => q{--really-quiet --force-media-title=*TITLE* --no-ytdl},
                               novideo => q{--no-video},
                              },
                      },
@@ -4381,7 +4381,7 @@ When C<download_and_play> is enabled, remove the file after playing it.
 
 =head2 resolution
 
-Preferred resolution for videos (if available).
+Preferred resolution for videos.
 
 Valid values: best, 2160p, 1440p, 1080p, 720p, 480p, 360p, 240p, 144p, audio.
 
@@ -4488,7 +4488,7 @@ Command for C<wget> when C<download_with_wget> is set to a true value.
 
 =head2 youtube_video_url
 
-Sprintf() format for an YouTube video URL, given the video ID.
+Format for C<sprintf()> for constructing an YouTube video URL given the video ID.
 
 =head2 ytdl
 

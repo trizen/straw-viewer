@@ -561,7 +561,8 @@ sub select_good_invidious_instances {
                    'vid.mint.lgbt'            => 1,
                    'invidious.ggc-project.de' => 1,
                    'invidious.toot.koeln'     => 1,
-                   'invidious.snopyta.org'    => 1,    # too popular == too slow
+                   'invidious.kavin.rocks'    => 1,
+                   'invidious.snopyta.org'    => 0,
                   );
 
     my @candidates =

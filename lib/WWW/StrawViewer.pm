@@ -969,12 +969,12 @@ sub _extract_streaming_urls {
     my @results;
     if (exists $json->{streamingData}) {
 
+        my $streamingData = $json->{streamingData};
+
         if (defined $streamingData->{dashManifestUrl}) {
             say STDERR ":: Contains DASH manifest URL" if $self->get_debug;
             return;
         }
-
-        my $streamingData = $json->{streamingData};
 
         if (exists $streamingData->{adaptiveFormats}) {
             push @results, @{$streamingData->{adaptiveFormats}};

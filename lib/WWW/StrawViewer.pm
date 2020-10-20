@@ -969,6 +969,11 @@ sub _extract_streaming_urls {
     my @results;
     if (exists $json->{streamingData}) {
 
+        if (defined $streamingData->{dashManifestUrl}) {
+            say STDERR ":: Contains DASH manifest URL" if $self->get_debug;
+            return;
+        }
+
         my $streamingData = $json->{streamingData};
 
         if (exists $streamingData->{adaptiveFormats}) {
@@ -981,6 +986,11 @@ sub _extract_streaming_urls {
     }
 
     $self->_check_streaming_urls($videoID, \@results);
+
+    if (grep { $_->{url} =~ /\bsc=yes\b/ } @results) {
+        say STDERR ":: Contains SC = yes" if $self->get_debug;
+        return;
+    }
 
     # Keep only streams with contentLength > 0.
     @results = grep { $_->{itag} == 22 or (exists($_->{contentLength}) and $_->{contentLength} > 0) } @results;

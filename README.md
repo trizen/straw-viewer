@@ -6,7 +6,7 @@ A lightweight application (fork of [youtube-viewer](https://github.com/trizen/yo
 
 * command-line interface to YouTube.
 
-![straw-viewer](https://user-images.githubusercontent.com/614513/73046877-5cae1200-3e7c-11ea-8ab3-f8c444f88b30.png)
+![straw-viewer](https://user-images.githubusercontent.com/614513/97738550-6d0faf00-1ad6-11eb-84ec-d37f28073d9d.png)
 
 ### gtk-straw-viewer
 

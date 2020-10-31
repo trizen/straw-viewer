@@ -2489,7 +2489,7 @@ sub display_results {
         my $current_instance = $yv_obj->get_api_host();
 
         # Server error. Pick another invidious instance.
-        # $yv_obj->pick_and_set_random_instance();
+        $yv_obj->pick_and_set_random_instance();
 
         die "Probably $current_instance is down.\n"
           . "\nTry changing the `api_host` in configuration file:\n\n"

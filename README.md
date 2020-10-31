@@ -121,6 +121,10 @@ Alternatively, the following will automatically pick a random invidious instance
 
 The available instances are listed at: https://instances.invidio.us/
 
+### PIPE-VIEWER
+
+[pipe-viewer](https://github.com/trizen/pipe-viewer) is an experimental fork of `straw-viewer` with the goal of parsing the YouTube website directly, and thus it may be a faster and more reliable alternative.
+
 
 ### SUPPORT AND DOCUMENTATION
 

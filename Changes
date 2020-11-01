@@ -5,6 +5,12 @@
 
 [CHANGELOG]
 
+Version 0.1.1
+
+- gtk: added the right-click "Play as audio" entry.
+- Better detection for HFR (High Frame Rate) videos.
+- Better selection of invidious instances.
+
 Version 0.1.0
 
 - Added the "ignore_av1" config-option.

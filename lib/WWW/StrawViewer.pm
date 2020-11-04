@@ -556,6 +556,7 @@ sub select_good_invidious_instances {
 
     my %ignored = (
                    'yewtu.be'                 => 1,
+                   'invidious.tube'           => 1,
                    'invidiou.site'            => 1,
                    'invidious.xyz'            => 1,
                    'vid.mint.lgbt'            => 1,
@@ -567,7 +568,15 @@ sub select_good_invidious_instances {
 
     my @candidates =
       grep { not $ignored{$_->[0]} }
-      grep { ref($_->[1]{monitor}) eq 'HASH' ? ($_->[1]{monitor}{statusClass} eq 'success') : $args{lax} }
+      grep {
+        $args{lax} ? 1 : eval { $_->[1]{monitor}{dailyRatios}[0]{label} eq 'success' }
+      }
+      grep {
+        $args{lax} ? 1 : eval { $_->[1]{monitor}{weeklyRatio}{label} eq 'success' }
+      }
+      grep {
+        $args{lax} ? 1 : eval { $_->[1]{monitor}{statusClass} eq 'success' }
+      }
       grep { lc($_->[1]{type} // '') eq 'https' } @$instances;
 
     if ($self->get_debug) {
@@ -581,12 +590,32 @@ sub select_good_invidious_instances {
     return @candidates;
 }
 
-sub pick_random_instance {
+sub pick_good_random_instance {
     my ($self) = @_;
     my @candidates = $self->select_good_invidious_instances();
 
     if (not @candidates) {
         @candidates = $self->select_good_invidious_instances(lax => 1);
+    }
+
+    require List::Util;
+    require WWW::StrawViewer::Utils;
+
+    state $yv_utils = WWW::StrawViewer::Utils->new();
+
+    foreach my $instance (List::Util::shuffle(@candidates)) {
+
+        ref($instance) eq 'ARRAY' or next;
+
+        my $uri = $instance->[1]{uri} // next;
+        $uri =~ s{/+\z}{};    # remove trailing '/'
+
+        local $self->{api_host} = $uri;
+        my $results = $self->search_videos('test');
+
+        if ($yv_utils->has_entries($results)) {
+            return $instance;
+        }
     }
 
     $candidates[rand @candidates];
@@ -595,7 +624,7 @@ sub pick_random_instance {
 sub pick_and_set_random_instance {
     my ($self) = @_;
 
-    my $instance = $self->pick_random_instance() // return;
+    my $instance = $self->pick_good_random_instance() // return;
 
     ref($instance) eq 'ARRAY' or return;
 

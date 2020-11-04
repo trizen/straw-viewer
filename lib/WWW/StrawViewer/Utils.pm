@@ -223,6 +223,8 @@ Returns true if a given result has entries.
 sub has_entries {
     my ($self, $result) = @_;
 
+    $result // return 0;
+
     if (ref($result->{results}) eq 'HASH') {
 
         foreach my $type (qw(comments videos playlists)) {
@@ -247,7 +249,6 @@ sub has_entries {
     }
 
     return 1;    # maybe?
-                 #ref($result) eq 'HASH' and ($result->{results}{pageInfo}{totalResults} > 0);
 }
 
 =head2 normalize_video_title($title, $fat32safe)

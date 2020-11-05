@@ -229,19 +229,20 @@ sub has_entries {
 
         foreach my $type (qw(comments videos playlists)) {
             if (exists $result->{results}{$type}) {
-                return scalar @{$result->{results}{$type}} > 0;
+                ref($result->{results}{$type}) eq 'ARRAY' or return 0;
+                return (@{$result->{results}{$type}} > 0);
             }
         }
 
         my $type = $result->{results}{type} // '';
 
         if ($type eq 'playlist') {
-            return $result->{results}{videoCount} > 0;
+            return ($result->{results}{videoCount} > 0);
         }
     }
 
     if (ref($result->{results}) eq 'ARRAY') {
-        return scalar(@{$result->{results}}) > 0;
+        return (@{$result->{results}} > 0);
     }
 
     if (ref($result->{results}) eq 'HASH' and not keys %{$result->{results}}) {

@@ -589,18 +589,16 @@ sub select_good_invidious_instances {
 
 sub pick_good_random_instance {
     my ($self) = @_;
-    my @candidates = $self->select_good_invidious_instances();
 
-    if (not @candidates) {
-        @candidates = $self->select_good_invidious_instances(lax => 1);
-    }
+    my @candidates       = $self->select_good_invidious_instances();
+    my @extra_candidates = $self->select_good_invidious_instances(lax => 1);
 
     require List::Util;
     require WWW::StrawViewer::Utils;
 
     state $yv_utils = WWW::StrawViewer::Utils->new();
 
-    foreach my $instance (List::Util::shuffle(@candidates)) {
+    foreach my $instance (List::Util::shuffle(@candidates), List::Util::shuffle(@extra_candidates)) {
 
         ref($instance) eq 'ARRAY' or next;
 

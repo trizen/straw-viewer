@@ -631,6 +631,10 @@ sub get_publication_date {
     #$self->format_date($info->{snippet}{publishedAt});
     #$self->format_date
 
+    if (defined $info->{publishedText}) {
+        return $info->{publishedText};
+    }
+
     require Encode;
     require Time::Piece;
 

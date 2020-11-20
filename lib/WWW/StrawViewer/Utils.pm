@@ -630,9 +630,12 @@ sub get_publication_date {
 
     #$self->format_date($info->{snippet}{publishedAt});
     #$self->format_date
+
+    require Encode;
     require Time::Piece;
+
     my $time = Time::Piece->new($info->{published});
-    $time->strftime("%d %B %Y");
+    Encode::decode_utf8($time->strftime("%d %B %Y"));
 }
 
 sub get_publication_age {

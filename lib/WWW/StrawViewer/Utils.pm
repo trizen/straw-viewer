@@ -628,9 +628,6 @@ sub get_category_name {
 sub get_publication_date {
     my ($self, $info) = @_;
 
-    #$self->format_date($info->{snippet}{publishedAt});
-    #$self->format_date
-
     if (defined $info->{publishedText}) {
         return $info->{publishedText};
     }

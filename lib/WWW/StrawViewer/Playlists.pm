@@ -25,10 +25,7 @@ sub _make_playlists_url {
         $opts{'part'} = 'snippet,contentDetails';
     }
 
-    $self->_make_feed_url(
-                          'playlists',
-                          %opts,
-                         );
+    $self->_make_feed_url('playlists', %opts);
 }
 
 sub get_playlist_id {

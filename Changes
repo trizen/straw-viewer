@@ -5,6 +5,10 @@
 
 [CHANGELOG]
 
+Version 0.1.2
+
+- Ensure that a randomly selected invidious instance actually works.
+
 Version 0.1.1
 
 - gtk: added the right-click "Play as audio" entry.

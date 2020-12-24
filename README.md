@@ -38,7 +38,6 @@ For trying the latest commit of `straw-viewer`, without installing it, execute t
     wget https://github.com/trizen/straw-viewer/archive/master.zip -O straw-viewer-master.zip
     unzip -n straw-viewer-master.zip
     cd straw-viewer-master/bin
-    perl -pi -ne 's{DEVEL = 0}{DEVEL = 1}' {gtk-,}straw-viewer
     ./straw-viewer
 ```
 

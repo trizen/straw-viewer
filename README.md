@@ -122,6 +122,10 @@ The available instances are listed at: https://instances.invidio.us/
 
 [pipe-viewer](https://github.com/trizen/pipe-viewer) is an experimental fork of `straw-viewer` with the goal of parsing the YouTube website directly, and thus it may be a faster and more reliable alternative.
 
+### VIDEO REVIEWS
+
+* [EN] Pipe-Viewer and Straw-Viewer -- Search Youtube via Terminal - Linux CLI
+    * https://www.youtube.com/watch?v=I4tfHUmklWo
 
 ### SUPPORT AND DOCUMENTATION
 

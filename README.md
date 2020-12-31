@@ -29,6 +29,11 @@ The project is in its early stages of development and some features are not impl
 * Slackware: https://slackbuilds.org/repository/14.2/multimedia/straw-viewer/
 
 
+### VIDEO REVIEWS
+
+* [EN] Pipe-Viewer and Straw-Viewer -- Search Youtube via Terminal - Linux CLI
+    * https://www.youtube.com/watch?v=I4tfHUmklWo
+
 ### TRY
 
 For trying the latest commit of `straw-viewer`, without installing it, execute the following commands:
@@ -121,11 +126,6 @@ The available instances are listed at: https://instances.invidio.us/
 ### PIPE-VIEWER
 
 [pipe-viewer](https://github.com/trizen/pipe-viewer) is an experimental fork of `straw-viewer` with the goal of parsing the YouTube website directly, and thus it may be a faster and more reliable alternative.
-
-### VIDEO REVIEWS
-
-* [EN] Pipe-Viewer and Straw-Viewer -- Search Youtube via Terminal - Linux CLI
-    * https://www.youtube.com/watch?v=I4tfHUmklWo
 
 ### SUPPORT AND DOCUMENTATION
 

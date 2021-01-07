@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2010-2020 Trizen <echo dHJpemVuQHByb3Rvbm1haWwuY29tCg== | base64 -d>.
+# Copyright (C) 2010-2021 Trizen <echo dHJpemVuQHByb3Rvbm1haWwuY29tCg== | base64 -d>.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of either: the GNU General Public License as published
@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  straw-viewer
 #  Fork: 14 February 2020
-#  Edit: 27 November 2020
+#  Edit: 07 January 2021
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -3531,10 +3531,7 @@ sub print_videos {
     }
 
     if (ref($videos) ne 'ARRAY') {
-
-        my $current_instance = $yv_obj->get_api_host();
-
-        say "\n:: Probably $current_instance is down. Try:";
+        say "\n:: Probably the selected instance is down. Try:";
         say "\n\t$0 --api=auto\n";
         say "See also: https://github.com/trizen/straw-viewer#invidious-instances";
         return;
@@ -4517,7 +4514,7 @@ https://github.com/trizen/straw-viewer
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2020 Trizen.
+Copyright 2010-2021 Trizen.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

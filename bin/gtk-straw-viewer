@@ -959,6 +959,12 @@ sub set_text {
     my ($object, $text, %args) = @_;
     my $object_buffer = $object->get_buffer;
 
+    require Encode;
+
+    if (!Encode::is_utf8($text)) {
+        $text = Encode::decode_utf8($text);
+    }
+
     if ($args{append}) {
         my $iter = $object_buffer->get_end_iter;
         $object_buffer->insert($iter, $text);

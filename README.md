@@ -121,7 +121,7 @@ Alternatively, the following will automatically pick a random invidious instance
     api_host => "auto",
 ```
 
-The available instances are listed at: https://instances.invidio.us/
+The available instances are listed at: https://api.invidious.io/
 
 ### PIPE-VIEWER
 

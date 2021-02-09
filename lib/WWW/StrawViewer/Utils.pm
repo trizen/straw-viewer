@@ -683,7 +683,7 @@ sub get_duration {
 sub get_time {
     my ($self, $info) = @_;
 
-    if ($info->{liveNow}) {
+    if ($info->{liveNow} and $self->get_duration($info) = 0) {
         return 'LIVE';
     }
 

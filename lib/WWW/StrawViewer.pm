@@ -31,7 +31,7 @@ WWW::StrawViewer - A very easy interface to YouTube, using the API of invidious.
 
 =cut
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 =head1 SYNOPSIS
 

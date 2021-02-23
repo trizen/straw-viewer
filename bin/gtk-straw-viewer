@@ -15,7 +15,7 @@
 #-------------------------------------------------------
 #  GTK Straw Viewer
 #  Fork: 14 February 2020
-#  Edit: 07 January 2021
+#  Edit: 23 February 2021
 #  https://github.com/trizen/straw-viewer
 #-------------------------------------------------------
 
@@ -31,7 +31,7 @@ no warnings 'once';
 my $DEVEL;                                           # true in devel mode
 use if ($DEVEL = -w __FILE__), lib => qw(../lib);    # devel only
 
-use WWW::StrawViewer v0.1.2;
+use WWW::StrawViewer v0.1.3;
 use WWW::StrawViewer::RegularExpressions;
 
 use Gtk3 qw(-init);
@@ -47,6 +47,9 @@ use File::Spec::Functions qw(
   );
 
 binmode(STDOUT, ':utf8');
+
+warn "[!] straw-viewer has been deprecated in favor of pipe-viewer\n";
+warn "[!] See: https://github.com/trizen/pipe-viewer\n";
 
 my $appname = 'GTK+ Straw Viewer';
 my $version = $WWW::StrawViewer::VERSION;

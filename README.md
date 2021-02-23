@@ -1,3 +1,5 @@
+## ** Deprecated in favor of: [pipe-viewer](https://github.com/trizen/pipe-viewer). ([info](https://github.com/trizen/pipe-viewer/commit/17fb2136f3f3d8ee6dacac05beabcc15082f699d))
+
 ## straw-viewer
 
 A lightweight application (fork of [youtube-viewer](https://github.com/trizen/youtube-viewer)) for searching and playing videos from YouTube, using the [API](https://github.com/iv-org/documentation/blob/master/API.md) of [invidio.us](https://invidio.us/).
